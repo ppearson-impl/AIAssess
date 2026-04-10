@@ -223,38 +223,6 @@ export default function Assessment() {
         {/* LANDING SCREEN */}
         {currentScreen === 'screen-landing' && (
           <div className="landing-container">
-            <div className="landing-left">
-              <h1>Workday AI Adoption Readiness Assessment</h1>
-              <p>Evidence-based diagnostics for your AI journey</p>
-              <div className="path-cards">
-                <div className="path-card green-accent">
-                  <h2>Quick Assessment</h2>
-                  <div className="badge">5 questions · 2 minutes</div>
-                  <p>Rapid AI adoption snapshot with feature roadmap and activation playbook.</p>
-                  <button 
-                    className="btn success" 
-                    disabled={!isFormValid()}
-                    onClick={startQuickAssessment}
-                    style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed', width: '100%'}}
-                  >
-                    Start Quick Assessment →
-                  </button>
-                </div>
-                <div className="path-card">
-                  <h2>Detailed Assessment</h2>
-                  <div className="badge">25 questions · 15 minutes</div>
-                  <p>Full readiness scorecard across 4 dimensions with priority recommendations.</p>
-                  <button 
-                    className="btn" 
-                    disabled={!isFormValid()}
-                    onClick={startDetailedAssessment}
-                    style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed', width: '100%'}}
-                  >
-                    Start Detailed Assessment →
-                  </button>
-                </div>
-              </div>
-            </div>
             <div className="landing-right">
               <div className="org-name-input">
                 <label htmlFor="org-name">Organisation Name</label>
@@ -289,6 +257,38 @@ export default function Assessment() {
                   </button>
                 </div>
               )}
+            </div>
+            <div className="landing-left">
+              <h1>Workday AI Adoption Readiness Assessment</h1>
+              <p>Evidence-based diagnostics for your AI journey</p>
+              <div className="path-cards">
+                <div className="path-card green-accent">
+                  <h2>Quick Assessment</h2>
+                  <div className="badge">5 questions · 2 minutes</div>
+                  <p>Rapid AI adoption snapshot with feature roadmap and activation playbook.</p>
+                  <button 
+                    className="btn success" 
+                    disabled={!isFormValid()}
+                    onClick={startQuickAssessment}
+                    style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed', width: '100%'}}
+                  >
+                    Start Quick Assessment →
+                  </button>
+                </div>
+                <div className="path-card">
+                  <h2>Detailed Assessment</h2>
+                  <div className="badge">25 questions · 15 minutes</div>
+                  <p>Full readiness scorecard across 4 dimensions with priority recommendations.</p>
+                  <button 
+                    className="btn" 
+                    disabled={!isFormValid()}
+                    onClick={startDetailedAssessment}
+                    style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed', width: '100%'}}
+                  >
+                    Start Detailed Assessment →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -473,81 +473,161 @@ export default function Assessment() {
         {/* MEASURES SCREEN */}
         {currentScreen === 'screen-measures' && (
           <div className="screen active">
-            <div style={{maxWidth: '1200px', margin: '0 auto 40px', padding: '0 20px'}}>
+            <div style={{maxWidth: '1400px', margin: '0 auto 40px', padding: '0 20px'}}>
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
-                <h2>Measures Reference — Assessment Questions</h2>
+                <h2>Measures Reference — Edit Assessment Questions</h2>
                 <button 
-                  className={`btn ${isEditMode ? 'danger' : 'secondary'}`}
-                  onClick={() => setIsEditMode(!isEditMode)}
+                  className="btn success"
+                  onClick={saveCustomMeasures}
                   style={{fontSize: '13px', padding: '8px 12px'}}
                 >
-                  {isEditMode ? '✓ Done Editing' : '✎ Edit Scoring'}
+                  💾 Save Changes
                 </button>
               </div>
               
-              <table className="measures-table" style={{borderCollapse: 'collapse', width: '100%'}}>
-                <thead>
-                  <tr>
-                    <th>Question ID</th>
-                    <th>Title</th>
-                    <th>Qualitative Approach</th>
-                    {isEditMode && <th>Score Guidance</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {(isEditMode ? editingDims : DIMS).map((dim: any) => (
-                    <React.Fragment key={dim.id}>
-                      <tr style={{background: dim.color, color: 'white'}}>
-                        <td colSpan={isEditMode ? 4 : 3}><strong>{dim.code}: {dim.name}</strong></td>
-                      </tr>
-                      {dim.qs.map((q: any) => (
-                        <tr key={q.id} className={`border-${dim.code.toLowerCase()}`} style={{borderBottom: '1px solid #ddd'}}>
-                          <td style={{fontWeight: '700', padding: '12px', width: '80px'}}>{q.id}</td>
-                          <td style={{fontWeight: '600', padding: '12px', minWidth: '200px'}}>{q.title}</td>
-                          <td style={{padding: '12px', width: '300px'}}>{q.qual}</td>
-                          {isEditMode && (
-                            <td style={{padding: '12px', maxWidth: '400px', fontSize: '12px'}}>
-                              {q.scoring ? (
-                                <div style={{display: 'grid', gap: '4px', maxHeight: '200px', overflowY: 'auto'}}>
-                                  {[1, 2, 3, 4, 5].map(score => (
-                                    <input 
-                                      key={score}
-                                      type="text"
-                                      value={q.scoring[score as keyof typeof q.scoring] || ''}
-                                      onChange={(e) => {
-                                        const newDims = JSON.parse(JSON.stringify(editingDims));
-                                        const dimIndex = newDims.findIndex((d: any) => d.id === dim.id);
-                                        const qIndex = newDims[dimIndex].qs.findIndex((question: any) => question.id === q.id);
-                                        newDims[dimIndex].qs[qIndex].scoring[score] = e.target.value;
-                                        setEditingDims(newDims);
-                                      }}
-                                      style={{fontSize: '11px', padding: '4px', border: '1px solid #ddd', borderRadius: '4px'}}
-                                      placeholder={`Level ${score} guidance...`}
-                                    />
-                                  ))}
-                                </div>
-                              ) : (
-                                <span style={{color: '#999'}}>No scoring guidance</span>
-                              )}
-                            </td>
-                          )}
-                        </tr>
+              <div style={{background: '#f9f9f9', borderRadius: '8px', padding: '20px'}}>
+                {(editingDims || DIMS).map((dim: any, dimIdx: number) => (
+                  <div key={dim.id} style={{marginBottom: '30px', background: 'white', padding: '20px', borderRadius: '8px', border: `2px solid ${dim.color}`}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px'}}>
+                      <div style={{width: '20px', height: '20px', background: dim.color, borderRadius: '4px'}}></div>
+                      <input 
+                        type="text"
+                        value={dim.name}
+                        onChange={(e) => {
+                          const newDims = JSON.parse(JSON.stringify(editingDims));
+                          newDims[dimIdx].name = e.target.value;
+                          setEditingDims(newDims);
+                        }}
+                        style={{fontSize: '16px', fontWeight: '600', flex: 1, padding: '6px 8px', border: '1px solid #ddd', borderRadius: '4px'}}
+                        placeholder="Dimension name"
+                      />
+                      <input 
+                        type="text"
+                        value={dim.code}
+                        onChange={(e) => {
+                          const newDims = JSON.parse(JSON.stringify(editingDims));
+                          newDims[dimIdx].code = e.target.value;
+                          setEditingDims(newDims);
+                        }}
+                        style={{fontSize: '12px', width: '60px', padding: '6px 8px', border: '1px solid #ddd', borderRadius: '4px'}}
+                        placeholder="Code"
+                      />
+                    </div>
+
+                    <div style={{marginLeft: '20px'}}>
+                      {dim.qs.map((q: any, qIdx: number) => (
+                        <div key={q.id} style={{marginBottom: '16px', padding: '12px', background: '#f5f5f5', borderRadius: '6px', borderLeft: `3px solid ${dim.color}`}}>
+                          <div style={{display: 'grid', gridTemplateColumns: '80px 1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'center'}}>
+                            <input 
+                              type="text"
+                              value={q.id}
+                              onChange={(e) => {
+                                const newDims = JSON.parse(JSON.stringify(editingDims));
+                                newDims[dimIdx].qs[qIdx].id = e.target.value;
+                                setEditingDims(newDims);
+                              }}
+                              style={{fontSize: '11px', padding: '4px 6px', border: '1px solid #ddd', borderRadius: '4px', fontWeight: '600'}}
+                              placeholder="Q ID"
+                            />
+                            <input 
+                              type="text"
+                              value={q.title}
+                              onChange={(e) => {
+                                const newDims = JSON.parse(JSON.stringify(editingDims));
+                                newDims[dimIdx].qs[qIdx].title = e.target.value;
+                                setEditingDims(newDims);
+                              }}
+                              style={{fontSize: '11px', padding: '4px 6px', border: '1px solid #ddd', borderRadius: '4px'}}
+                              placeholder="Title"
+                            />
+                            <input 
+                              type="text"
+                              value={q.qual}
+                              onChange={(e) => {
+                                const newDims = JSON.parse(JSON.stringify(editingDims));
+                                newDims[dimIdx].qs[qIdx].qual = e.target.value;
+                                setEditingDims(newDims);
+                              }}
+                              style={{fontSize: '11px', padding: '4px 6px', border: '1px solid #ddd', borderRadius: '4px'}}
+                              placeholder="Qualitative"
+                            />
+                            <button 
+                              onClick={() => {
+                                const newDims = JSON.parse(JSON.stringify(editingDims));
+                                newDims[dimIdx].qs.splice(qIdx, 1);
+                                setEditingDims(newDims);
+                              }}
+                              style={{padding: '4px 8px', background: '#ff6b6b', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '11px'}}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                          <div style={{display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', fontSize: '10px'}}>
+                            {[1, 2, 3, 4, 5].map(score => (
+                              <input 
+                                key={score}
+                                type="text"
+                                value={(q.scoring as any)?.[score] || ''}
+                                onChange={(e) => {
+                                  const newDims = JSON.parse(JSON.stringify(editingDims));
+                                  if (!newDims[dimIdx].qs[qIdx].scoring) {
+                                    newDims[dimIdx].qs[qIdx].scoring = {};
+                                  }
+                                  newDims[dimIdx].qs[qIdx].scoring[score] = e.target.value;
+                                  setEditingDims(newDims);
+                                }}
+                                style={{padding: '4px', border: '1px solid #ddd', borderRadius: '4px'}}
+                                placeholder={`Level ${score}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
                       ))}
-                    </React.Fragment>
-                  ))}
-                </tbody>
-              </table>
+                    </div>
+
+                    <button 
+                      onClick={() => {
+                        const newDims = JSON.parse(JSON.stringify(editingDims));
+                        newDims[dimIdx].qs.push({
+                          id: `${dim.code}${newDims[dimIdx].qs.length + 1}`,
+                          title: 'New Question',
+                          qual: 'Question description',
+                          scoring: { 1: '', 2: '', 3: '', 4: '', 5: '' }
+                        });
+                        setEditingDims(newDims);
+                      }}
+                      style={{marginLeft: '20px', padding: '6px 12px', background: dim.color, color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px'}}
+                    >
+                      + Add Question
+                    </button>
+                  </div>
+                ))}
+
+                <button 
+                  onClick={() => {
+                    const newDims = JSON.parse(JSON.stringify(editingDims));
+                    const newColor = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA502'][newDims.length % 4];
+                    newDims.push({
+                      id: newDims.length + 1,
+                      code: `D${newDims.length + 1}`,
+                      name: 'New Dimension',
+                      color: newColor,
+                      qs: [{
+                        id: `D${newDims.length + 1}1`,
+                        title: 'First Question',
+                        qual: 'Question description',
+                        scoring: { 1: '', 2: '', 3: '', 4: '', 5: '' }
+                      }]
+                    });
+                    setEditingDims(newDims);
+                  }}
+                  style={{padding: '8px 16px', background: '#27AE60', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '600'}}
+                >
+                  + Add New Dimension/Section
+                </button>
+              </div>
               
               <div style={{marginTop: '20px'}}>
-                {isEditMode && (
-                  <button 
-                    className="btn success"
-                    onClick={saveCustomMeasures}
-                    style={{marginRight: '10px'}}
-                  >
-                    💾 Save All Changes
-                  </button>
-                )}
                 <button className="btn secondary" onClick={() => showScreen('screen-landing')}>← Back to Home</button>
               </div>
             </div>
@@ -579,7 +659,7 @@ export default function Assessment() {
                           <p style={{color: '#666', fontSize: '14px'}}>{q.qual}</p>
                         </div>
                         
-                        <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center'}}>
+                        <div style={{display: 'flex', gap: '6px', flexWrap: 'nowrap', justifyContent: 'center', overflowX: 'auto', paddingBottom: '8px'}}>
                           {[
                             { val: 1, label: 'Emerging', desc: 'Early stage' },
                             { val: 2, label: 'Emerging', desc: 'Established' },
@@ -599,8 +679,10 @@ export default function Assessment() {
                                   flexDirection: 'column',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  minWidth: '140px',
-                                  padding: '12px 8px',
+                                  flex: '0 0 auto',
+                                  width: '120px',
+                                  minHeight: '100px',
+                                  padding: '10px 8px',
                                   border: isSelected ? `3px solid ${selectedColor}` : '2px solid #E8E8E8',
                                   background: isSelected ? `${selectedColor}15` : '#FAFAFA',
                                   borderRadius: '8px',
@@ -609,7 +691,9 @@ export default function Assessment() {
                                   boxShadow: isSelected ? `0 4px 12px ${selectedColor}40` : 'none',
                                   fontWeight: isSelected ? '700' : '600',
                                   fontSize: '11px',
-                                  color: isSelected ? selectedColor : '#555'
+                                  color: isSelected ? selectedColor : '#555',
+                                  wordWrap: 'break-word',
+                                  whiteSpace: 'normal'
                                 }}
                                 onMouseEnter={(e) => {
                                   if (!isSelected) {
@@ -628,7 +712,7 @@ export default function Assessment() {
                                 }}
                               >
                                 <div style={{fontSize: '16px', fontWeight: '800', marginBottom: '4px', color: selectedColor}}>Level {item.val}</div>
-                                <div style={{fontSize: '10px', lineHeight: '1.3', textAlign: 'center'}}>{answerText}</div>
+                                <div style={{fontSize: '10px', lineHeight: '1.3', textAlign: 'center', wordBreak: 'break-word'}}>{answerText}</div>
                               </button>
                             );
                           })}
