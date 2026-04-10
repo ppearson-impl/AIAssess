@@ -493,12 +493,12 @@ export default function Assessment() {
                   </tr>
                 </thead>
                 <tbody>
-                  {(isEditMode ? editingDims : DIMS).map(dim => (
+                  {(isEditMode ? editingDims : DIMS).map((dim: any) => (
                     <React.Fragment key={dim.id}>
                       <tr style={{background: dim.color, color: 'white'}}>
                         <td colSpan={isEditMode ? 4 : 3}><strong>{dim.code}: {dim.name}</strong></td>
                       </tr>
-                      {dim.qs.map(q => (
+                      {dim.qs.map((q: any) => (
                         <tr key={q.id} className={`border-${dim.code.toLowerCase()}`} style={{borderBottom: '1px solid #ddd'}}>
                           <td style={{fontWeight: '700', padding: '12px', width: '80px'}}>{q.id}</td>
                           <td style={{fontWeight: '600', padding: '12px', minWidth: '200px'}}>{q.title}</td>
