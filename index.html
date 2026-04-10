@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workday AI Adoption Readiness Assessment — Kainos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #283583;
+      --mid-blue: #41679F;
+      --green: #61A83F;
+      --dark-green: #004631;
+      --dark-navy: #1B284F;
+      --orange: #EC6608;
+      --light-bg: #F4F5FA;
+      --border: #DDE1EE;
+      --dark-text: #404040;
+      --tf-color: #283583;
+      --ds-color: #41679F;
+      --aa-color: #61A83F;
+      --gw-color: #EC6608;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Century Gothic', 'Gill Sans MT', 'Inter', Arial, sans-serif;
+      background: #fafbfc;
+      color: var(--dark-text);
+      line-height: 1.6;
+    }
+
+    /* ===== HEADER & NAVIGATION ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: linear-gradient(90deg, var(--blue) 0%, var(--mid-blue) 100%);
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 14px; }
+    .header-nav { display: flex; gap: 10px; }
+    .nav-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .nav-btn:hover { background: rgba(255,255,255,0.3); }
+
+    /* ===== MAIN CONTENT ===== */
+    .container { min-height: calc(100vh - 60px); position: relative; }
+    .screen { display: none; min-height: 100%; padding: 40px 20px; }
+    .screen.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ===== LANDING SCREEN ===== */
+    .hero-gradient { background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%); color: white; padding: 60px 20px; text-align: center; }
+    .hero-gradient h1 { font-size: 48px; font-weight: 700; margin-bottom: 12px; }
+    .hero-gradient p { font-size: 20px; opacity: 0.95; margin-bottom: 40px; }
+
+    .path-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1000px; margin: 40px auto; }
+    @media(max-width: 768px) { .path-cards { grid-template-columns: 1fr; } }
+
+    .path-card {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-top: 4px solid var(--blue);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .path-card:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .path-card.green-accent { border-top-color: var(--green); }
+
+    .path-card h2 { font-size: 24px; margin-bottom: 12px; color: var(--dark-navy); }
+    .path-card p { color: var(--dark-text); margin-bottom: 20px; font-size: 15px; }
+    .path-card .badge { display: inline-block; background: var(--light-bg); padding: 6px 12px; border-radius: 4px; font-size: 13px; color: var(--dark-text); margin-bottom: 16px; }
+
+    .btn {
+      display: inline-block;
+      background: var(--blue);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--dark-navy); }
+    .btn.secondary { background: var(--mid-blue); }
+    .btn.success { background: var(--green); }
+    .btn.warning { background: var(--orange); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .org-name-input {
+      max-width: 400px;
+      margin: 30px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .org-name-input input {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    /* ===== ASSESSMENT SCREENS ===== */
+    .progress-bar {
+      height: 4px;
+      background: var(--light-bg);
+      margin-bottom: 40px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar .fill { background: var(--green); height: 100%; transition: width 0.3s; }
+
+    .question-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 30px;
+      margin: 20px auto;
+      max-width: 700px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .question-card:hover { border-color: var(--blue); }
+    .question-card.selected { border-color: var(--green); background: rgba(97, 168, 63, 0.02); }
+
+    .question-card h3 { font-size: 18px; margin-bottom: 12px; color: var(--dark-navy); }
+    .question-card p { color: var(--dark-text); font-size: 15px; margin-bottom: 16px; }
+
+    .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    @media(max-width: 600px) { .option-grid { grid-template-columns: 1fr; } }
+
+    .option-btn {
+      background: white;
+      border: 2px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+      text-align: left;
+    }
+    .option-btn:hover { border-color: var(--blue); }
+    .option-btn.selected { background: var(--blue); color: white; border-color: var(--blue); }
+
+    .nav-buttons { display: flex; gap: 12px; justify-content: center; margin-top: 40px; }
+    .nav-buttons button { padding: 10px 20px; font-size: 14px; }
+
+    /* ===== SCORE SELECTOR (DETAILED) ===== */
+    .score-selector {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .score-btn {
+      width: 50px;
+      height: 50px;
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+    .score-btn:hover { border-color: var(--blue); }
+    .score-btn.selected { background: var(--blue); color: white; border-color: var(--blue); }
+
+    .score-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--dark-text);
+      margin-top: 8px;
+      padding: 0 5px;
+    }
+
+    .expandable {
+      margin-top: 16px;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+    }
+    .expandable-header {
+      cursor: pointer;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 600;
+      user-select: none;
+    }
+    .expandable-header:hover { text-decoration: underline; }
+    .expandable-content {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--light-bg);
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .expandable-content.show { display: block; }
+
+    /* ===== RESULTS PAGES ===== */
+    .results-hero {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .results-hero h1 { font-size: 40px; margin-bottom: 8px; }
+    .results-hero .meta { font-size: 14px; opacity: 0.9; margin-top: 8px; }
+
+    .print-bar {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      max-width: 1200px;
+      margin: 0 auto 30px;
+      padding: 0 20px;
+      flex-wrap: wrap;
+    }
+
+    .profile-strip {
+      display: flex;
+      gap: 12px;
+      max-width: 1200px;
+      margin: 0 auto 30px;
+      padding: 0 20px;
+      flex-wrap: wrap;
+    }
+    .profile-pill {
+      background: white;
+      border: 1px solid var(--border);
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .lanes-container {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media(max-width: 900px) { .lanes-container { grid-template-columns: 1fr; } }
+
+    .lane {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .lane-header {
+      padding: 16px;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .lane-header.now { background: var(--green); }
+    .lane-header.next { background: var(--blue); }
+    .lane-header.watch { background: var(--orange); }
+
+    .lane-body { padding: 16px; }
+    .feature-card {
+      background: var(--light-bg);
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    .feature-card .title { font-weight: 600; color: var(--dark-navy); margin-bottom: 4px; }
+    .feature-card .desc { color: var(--dark-text); font-size: 12px; margin-bottom: 6px; }
+    .feature-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge-small { display: inline-block; background: white; padding: 3px 8px; border-radius: 3px; font-size: 11px; border: 1px solid var(--border); }
+    .badge-small.area { background: var(--light-bg); color: var(--blue); font-weight: 600; }
+    .badge-small.sku { border-color: var(--orange); color: var(--orange); }
+
+    .kpi-grid {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media(max-width: 900px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi-tile {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .kpi-value { font-size: 32px; font-weight: 700; color: var(--green); margin-bottom: 8px; }
+    .kpi-label { font-size: 14px; font-weight: 600; color: var(--dark-navy); margin-bottom: 4px; }
+    .kpi-note { font-size: 12px; color: var(--dark-text); }
+
+    .section-title { font-size: 18px; font-weight: 700; color: var(--dark-navy); margin: 40px auto 20px; max-width: 1200px; padding: 0 20px; }
+
+    .playbook-steps {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    @media(max-width: 900px) { .playbook-steps { grid-template-columns: 1fr; } }
+
+    .playbook-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .playbook-card .week { font-size: 12px; font-weight: 700; color: var(--blue); margin-bottom: 8px; }
+    .playbook-card p { font-size: 13px; line-height: 1.5; }
+
+    .dimensions-grid {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    @media(max-width: 900px) { .dimensions-grid { grid-template-columns: 1fr; } }
+
+    .dim-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-left: 4px solid var(--blue);
+    }
+    .dim-card.ds { border-left-color: var(--ds-color); }
+    .dim-card.aa { border-left-color: var(--aa-color); }
+    .dim-card.gw { border-left-color: var(--gw-color); }
+
+    .dim-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .dim-card h3 { font-size: 16px; font-weight: 700; color: var(--dark-navy); }
+    .dim-score { font-size: 28px; font-weight: 700; color: var(--green); }
+
+    .dim-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--light-bg);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .dim-bar-fill { height: 100%; background: var(--green); transition: width 0.3s; }
+
+    .dim-label { font-size: 12px; color: var(--dark-text); }
+
+    .heatmap { max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
+    .heatmap-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .heatmap-table th, .heatmap-table td { padding: 8px; text-align: left; border: 1px solid var(--border); }
+    .heatmap-table th { background: var(--light-bg); font-weight: 700; }
+    .heatmap-cell { text-align: center; }
+    .heat-1 { background: #fee5e5; }
+    .heat-3 { background: #fde8d3; }
+    .heat-5 { background: #d4f4dd; }
+
+    /* ===== MEASURES TABLE ===== */
+    .measures-table { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .measures-table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .measures-table th, .measures-table td { padding: 12px; text-align: left; border: 1px solid var(--border); }
+    .measures-table th { background: var(--light-bg); font-weight: 700; color: var(--dark-navy); }
+    .measures-table tr:nth-child(even) { background: #fafbfc; }
+    .dim-section { background: var(--light-bg); font-weight: 700; }
+    .dim-section td { padding: 14px 12px; color: var(--dark-navy); }
+    .border-tf { border-left: 4px solid var(--tf-color); }
+    .border-ds { border-left: 4px solid var(--ds-color); }
+    .border-aa { border-left: 4px solid var(--aa-color); }
+    .border-gw { border-left: 4px solid var(--gw-color); }
+
+    /* ===== DEV NOTES ===== */
+    .devnotes { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+    .devnotes h2 { font-size: 24px; font-weight: 700; color: var(--dark-navy); margin: 30px 0 16px; }
+    .devnotes h3 { font-size: 18px; font-weight: 700; color: var(--blue); margin: 24px 0 12px; }
+    .devnotes p { margin-bottom: 12px; line-height: 1.6; }
+    .devnotes ul { margin-left: 20px; margin-bottom: 12px; }
+    .devnotes li { margin-bottom: 6px; }
+    .code-block {
+      background: #f5f5f5;
+      border-left: 4px solid var(--blue);
+      padding: 12px;
+      margin: 12px 0;
+      overflow-x: auto;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* ===== STEPPER ===== */
+    .stepper {
+      display: flex;
+      gap: 12px;
+      max-width: 700px;
+      margin: 0 auto 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .step { padding: 8px 16px; border-radius: 4px; font-size: 13px; font-weight: 600; background: var(--light-bg); color: var(--dark-text); }
+    .step.active { background: var(--blue); color: white; }
+    .step.complete { background: var(--green); color: white; }
+
+    /* ===== UTILITY ===== */
+    .cta-footer {
+      text-align: center;
+      padding: 30px 20px;
+      background: var(--light-bg);
+      margin-top: 40px;
+    }
+    .cta-footer p { margin-bottom: 16px; }
+
+    .level-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--light-bg);
+      color: var(--dark-text);
+    }
+    .level-badge.ready { background: #d4f4dd; color: var(--dark-green); }
+    .level-badge.developing { background: #fff4e6; color: var(--orange); }
+    .level-badge.not-ready { background: #fee5e5; color: #c53030; }
+
+    @media print {
+      .nav-btn, .print-bar button, .nav-buttons { display: none !important; }
+      .screen { padding: 0; page-break-inside: avoid; }
+      .lane, .kpi-tile, .dim-card, .playbook-card { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================
+  WORKDAY AI ADOPTION READINESS ASSESSMENT
+
+  PRODUCT: Unified SPA for evidence-based AI readiness diagnostics
+  OWNER: Kainos Workday AI Center of Excellence
+
+  ARCHITECTURE:
+  - Single-page HTML + vanilla JS, no external frameworks
+  - Screens: landing, quick-0..4, quick-results, dim-0..3, results, measures, devnotes
+  - Navigation model: showScreen(id), showMeasures(), showDevNotes()
+  - Responsive design, print-optimised
+
+  DATA STRUCTURES:
+  - QUICK_QS: 5 quick assessment questions
+  - PAIN_FEATURES: features grouped by pain point (HR, Talent, Payroll, Finance, Planning)
+  - KPI_MAP: 3-5 KPIs per pain point
+  - PLAYBOOK_MAP: 4-week activation playbook per pain point
+  - WD_FEATURES: 30+ Workday AI features (GA, Preview, SKU types)
+  - DIMS: 4 dimensions with 25 total questions with anchors, measures, reports
+
+  SCORING: 1-5 scale per question, dimension average, overall average, level thresholds
+
+  RECOMMENDATION ENGINE:
+  - Quick: features based on pain point, filtered by agent readiness
+  - Detailed: top 8 features from lowest-scoring dimension
+
+  HOW TO EXTEND:
+  1. Add questions: insert into DIMS[].qs array
+  2. Add features: extend WD_FEATURES array or PAIN_FEATURES by key
+  3. Add playbooks: extend PLAYBOOK_MAP object
+  4. Modify scoring: edit getReadinessLevel(), calculateDimensionScores()
+
+  ============================================ -->
+
+<div class="header">
+  <div class="header-left">📊 Workday AI Readiness Assessment</div>
+  <div class="header-nav">
+    <button class="nav-btn" onclick="showMeasures()">📊 Measures</button>
+    <button class="nav-btn" onclick="showDevNotes()">?</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SCREEN: LANDING -->
+  <div id="screen-landing" class="screen active">
+    <div class="hero-gradient">
+      <h1>Workday AI Adoption Readiness Assessment</h1>
+      <p>Evidence-based diagnostics for your AI journey</p>
+    </div>
+    <div class="org-name-input">
+      <label for="org-name">Organisation Name</label>
+      <input type="text" id="org-name" placeholder="e.g. Acme Corp, Global Finance Ltd">
+    </div>
+    <div class="path-cards">
+      <div class="path-card green-accent">
+        <h2>Quick Assessment</h2>
+        <div class="badge">5 questions · 2 minutes</div>
+        <p>Rapid AI adoption snapshot with feature roadmap and activation playbook.</p>
+        <button class="btn success" onclick="startQuickAssessment()">Start Quick Assessment →</button>
+      </div>
+      <div class="path-card">
+        <h2>Detailed Assessment</h2>
+        <div class="badge">25 questions · 15 minutes</div>
+        <p>Full readiness scorecard across 4 dimensions with priority recommendations.</p>
+        <button class="btn" onclick="startDetailedAssessment()">Start Detailed Assessment →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREENS: QUICK ASSESSMENT (Q0-Q4) -->
+  <div id="screen-quick-0" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 20%"></div></div>
+    <h2 style="text-align: center; margin-bottom: 30px;">Quick Assessment — Question 1 of 5</h2>
+    <div id="quick-q0-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="showScreen('screen-landing')">Back</button>
+      <button class="btn" id="quick-next-0" disabled onclick="gotoQuickQ(1)">Next →</button>
+    </div>
+  </div>
+
+  <div id="screen-quick-1" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 40%"></div></div>
+    <h2 style="text-align: center; margin-bottom: 30px;">Quick Assessment — Question 2 of 5</h2>
+    <div id="quick-q1-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="gotoQuickQ(0)">Back</button>
+      <button class="btn" id="quick-next-1" disabled onclick="gotoQuickQ(2)">Next →</button>
+    </div>
+  </div>
+
+  <div id="screen-quick-2" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 60%"></div></div>
+    <h2 style="text-align: center; margin-bottom: 30px;">Quick Assessment — Question 3 of 5</h2>
+    <div id="quick-q2-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="gotoQuickQ(1)">Back</button>
+      <button class="btn" id="quick-next-2" disabled onclick="gotoQuickQ(3)">Next →</button>
+    </div>
+  </div>
+
+  <div id="screen-quick-3" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 80%"></div></div>
+    <h2 style="text-align: center; margin-bottom: 30px;">Quick Assessment — Question 4 of 5</h2>
+    <div id="quick-q3-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="gotoQuickQ(2)">Back</button>
+      <button class="btn" id="quick-next-3" disabled onclick="gotoQuickQ(4)">Next →</button>
+    </div>
+  </div>
+
+  <div id="screen-quick-4" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+    <h2 style="text-align: center; margin-bottom: 30px;">Quick Assessment — Question 5 of 5</h2>
+    <div id="quick-q4-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="gotoQuickQ(3)">Back</button>
+      <button class="btn success" id="quick-next-4" disabled onclick="buildQuickResults()">View Results →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: QUICK RESULTS -->
+  <div id="screen-quick-results" class="screen">
+    <div id="quick-results-content"></div>
+  </div>
+
+  <!-- SCREENS: DETAILED ASSESSMENT (DIM 0-3) -->
+  <div id="screen-dim-0" class="screen">
+    <div class="stepper" id="stepper-dim-0"></div>
+    <div id="dim-0-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="showScreen('screen-landing')">Back</button>
+      <button class="btn" id="dim-next-0" disabled onclick="gotoDim(1)">Next Dimension →</button>
+    </div>
+  </div>
+
+  <div id="screen-dim-1" class="screen">
+    <div class="stepper" id="stepper-dim-1"></div>
+    <div id="dim-1-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="gotoDim(0)">Back</button>
+      <button class="btn" id="dim-next-1" disabled onclick="gotoDim(2)">Next Dimension →</button>
+    </div>
+  </div>
+
+  <div id="screen-dim-2" class="screen">
+    <div class="stepper" id="stepper-dim-2"></div>
+    <div id="dim-2-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="gotoDim(1)">Back</button>
+      <button class="btn" id="dim-next-2" disabled onclick="gotoDim(3)">Next Dimension →</button>
+    </div>
+  </div>
+
+  <div id="screen-dim-3" class="screen">
+    <div class="stepper" id="stepper-dim-3"></div>
+    <div id="dim-3-content"></div>
+    <div class="nav-buttons">
+      <button class="btn secondary" onclick="gotoDim(2)">Back</button>
+      <button class="btn success" id="dim-next-3" disabled onclick="buildResults()">View Full Results →</button>
+    </div>
+  </div>
+
+  <!-- SCREEN: DETAILED RESULTS -->
+  <div id="screen-results" class="screen">
+    <div id="results-content"></div>
+  </div>
+
+  <!-- SCREEN: MEASURES REFERENCE -->
+  <div id="screen-measures" class="screen">
+    <div class="measures-table" id="measures-content"></div>
+  </div>
+
+  <!-- SCREEN: DEVELOPER NOTES -->
+  <div id="screen-devnotes" class="screen">
+    <div class="devnotes" id="devnotes-content"></div>
+  </div>
+
+</div>
+
+<script>
+// ============================================
+// GLOBAL STATE
+// ============================================
+let quickAnswers = {};
+const scores = {};
+let prevScreen = 'screen-landing';
+const orgNameEl = () => document.getElementById('org-name').value || 'Your Organisation';
+
+// ============================================
+// QUICK ASSESSMENT QUESTIONS
+// ============================================
+const QUICK_QS = [
+  {
+    id: 'q-modules',
+    title: 'Which Workday modules does your organisation actively use?',
+    options: [
+      { value: 'hcm-only', label: 'HCM only', badge: 'HCM', desc: 'Human Capital Management only' },
+      { value: 'fins-only', label: 'Financials only', badge: 'Finance', desc: 'Financials only' },
+      { value: 'hcm-fins', label: 'HCM + Financials', badge: 'Full Suite', desc: 'HCM and Financials' },
+      { value: 'hcm-fins-planning', label: 'HCM + Financials + Adaptive Planning', badge: 'Enterprise', desc: 'Full core suite' },
+      { value: 'with-extras', label: 'Full suite + add-ons', badge: 'Extended', desc: 'Includes additional products' }
+    ]
+  },
+  {
+    id: 'q-stage',
+    title: 'Where is your organisation on the Workday AI journey?',
+    options: [
+      { value: 'not-started', label: 'Not started', desc: 'AI is on the radar but not yet activated' },
+      { value: 'aware', label: 'Aware, not yet activated', desc: 'Teams aware of AI features but not using' },
+      { value: 'some-live', label: 'Some features live', desc: 'Pilots or early rollouts underway' },
+      { value: 'active', label: 'Actively adopting', desc: 'Multiple features live, scaling adoption' }
+    ]
+  },
+  {
+    id: 'q-pain',
+    title: 'What is your single biggest operational pain point right now?',
+    options: [
+      { value: 'hr_admin', label: 'HR Admin Reduction', desc: 'HR team overwhelmed with manual tasks & queries' },
+      { value: 'talent_skills', label: 'Talent & Skills', desc: 'Recruiting, retention, skills gaps' },
+      { value: 'payroll_compliance', label: 'Payroll & Compliance', desc: 'Payroll errors, audit complexity, compliance risk' },
+      { value: 'finance_manual', label: 'Finance Automation', desc: 'Manual reconciliation, expense processing, cash app' },
+      { value: 'workforce_planning', label: 'Workforce Planning', desc: 'Scheduling, forecasting, labour demand' }
+    ]
+  },
+  {
+    id: 'q-agents',
+    title: 'How ready is your organisation to adopt AI Agents specifically?',
+    options: [
+      { value: 'not-yet', label: 'Not yet — start with embedded AI', desc: 'Prefer to master embedded AI first' },
+      { value: 'one-agent', label: 'Open to one Agent', desc: 'Willing to pilot one Agent' },
+      { value: 'priority', label: 'Agents are a priority', desc: 'Actively wanting Agents' },
+      { value: 'all-in', label: 'All-in on Agents', desc: 'Agents central to strategy' }
+    ]
+  },
+  {
+    id: 'q-orgtype',
+    title: 'What best describes your organisation?',
+    options: [
+      { value: 'mid-market', label: 'Mid-market (500–5k employees)', desc: 'Mid-sized organisation' },
+      { value: 'enterprise', label: 'Enterprise (5k–50k employees)', desc: 'Large multi-region' },
+      { value: 'global-enterprise', label: 'Global enterprise (50k+ employees)', desc: 'Multi-country, highly complex' },
+      { value: 'professional-services', label: 'Professional services', desc: 'Consulting, legal, accounting' }
+    ]
+  }
+];
+
+// ============================================
+// PAIN POINT FEATURES
+// ============================================
+const PAIN_FEATURES = {
+  hr_admin: [
+    { name:'Self Service Agent', area:'HCM', sku:'Agent SKU', skuType:'agent', lane:'next', desc:'Multi-turn conversational AI for employee self-service' },
+    { name:'Intelligent Answers', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'AI-powered answers to common HR questions' },
+    { name:'Workday Help AI', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'AI guidance embedded in Workday' },
+    { name:'AI QuickTips', area:'Platform', sku:'Included', skuType:'included', lane:'now', desc:'Context-aware tips to speed user tasks' },
+    { name:'Form Completion Assistant', area:'Platform', sku:'Included', skuType:'included', lane:'now', desc:'Auto-completes form fields based on context' },
+    { name:'Workday Assistant', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'Embedded assistant for HCM tasks' },
+    { name:'Workflow Routing', area:'Platform', sku:'Included (Preview)', skuType:'preview', lane:'watch', desc:'AI routes users to correct workflows' },
+    { name:'Peakon Attrition Prediction', area:'Peakon EV', sku:'Separate License', skuType:'separate', lane:'watch', desc:'Predict attrition risk' }
+  ],
+  talent_skills: [
+    { name:'Suggested Skills on Worker Profile', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'AI suggests missing skills for workers' },
+    { name:'Job Description Generation', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'Generates job descriptions with AI' },
+    { name:'Candidate Skills Match', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'Matches candidates by skills' },
+    { name:'Market Skills', area:'HCM', sku:'Included (opt-in)', skuType:'included', lane:'now', desc:'Compare skills to market benchmarks' },
+    { name:'Talent Highlights', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'AI summaries of top talent' },
+    { name:'Performance Summary AI Widget', area:'HCM', sku:'Included', skuType:'included', lane:'now', desc:'AI-generated performance summaries' },
+    { name:'Career Hub', area:'HCM', sku:'Included', skuType:'included', lane:'next', desc:'AI-powered career guidance and learning' },
+    { name:'Spotlight (HiredScore)', area:'HiredScore', sku:'Separate License', skuType:'separate', lane:'watch', desc:'AI-powered candidate evaluation' }
+  ],
+  payroll_compliance: [
+    { name:'Pay Anomalies', area:'Payroll', sku:'Included', skuType:'included', lane:'now', desc:'Detects pay anomalies before processing' },
+    { name:'Time Anomalies', area:'Workforce Mgmt', sku:'Included', skuType:'included', lane:'now', desc:'Flags unusual time entries' },
+    { name:'FLSA & FSB Insights', area:'Workforce Mgmt', sku:'Included', skuType:'included', lane:'now', desc:'Compliance insights for US Fair Labor' },
+    { name:'Payroll Agent', area:'Payroll', sku:'Agent SKU', skuType:'agent', lane:'next', desc:'Conversational AI for payroll queries & insights' },
+    { name:'BP Optimize Agent', area:'Platform', sku:'Agent SKU', skuType:'agent', lane:'watch', desc:'Optimises business processes with AI' }
+  ],
+  finance_manual: [
+    { name:'Receipt Scanning for Expenses', area:'Finance', sku:'Included', skuType:'included', lane:'now', desc:'Scans receipts and populates expense claims' },
+    { name:'Intelligent Expense Recommendations', area:'Finance', sku:'Included', skuType:'included', lane:'now', desc:'Suggests correct expense codes' },
+    { name:'AI Bank Reconciliation', area:'Finance', sku:'Included', skuType:'included', lane:'now', desc:'Automates bank recon matching' },
+    { name:'Cash Application Insights', area:'Finance', sku:'Included', skuType:'included', lane:'now', desc:'Applies cash to correct invoices' },
+    { name:'Collection Letters', area:'Finance', sku:'Included', skuType:'included', lane:'next', desc:'AI-drafted collection letter templates' },
+    { name:'Intelligent Prompt Rec. (AR & Cash)', area:'Finance', sku:'Included', skuType:'included', lane:'next', desc:'AR prompt recommendations' },
+    { name:'AI Drafting Tools (Contracts)', area:'CLM', sku:'Separate License', skuType:'separate', lane:'watch', desc:'AI contract drafting' }
+  ],
+  workforce_planning: [
+    { name:'Labor Demand Forecasting', area:'Workforce Mgmt', sku:'Included', skuType:'included', lane:'now', desc:'Forecasts labour demand with AI' },
+    { name:'Scheduling Optimization Engine', area:'Workforce Mgmt', sku:'Included', skuType:'included', lane:'now', desc:'Optimises schedule automatically' },
+    { name:'Conversational Scheduling', area:'Workforce Mgmt', sku:'Included', skuType:'included', lane:'now', desc:'Chat-based scheduling assistant' },
+    { name:'Workday Writing Prompt', area:'Workforce Mgmt', sku:'Included', skuType:'included', lane:'now', desc:'AI assistant for writing tasks' },
+    { name:'Predictive Forecasting (Adaptive)', area:'Adaptive Planning', sku:'Separate License', skuType:'separate', lane:'next', desc:'Advanced demand forecasting' },
+    { name:'Planning Agent', area:'Adaptive Planning', sku:'Agent SKU (Preview)', skuType:'agent', lane:'watch', desc:'Conversational planning agent' },
+    { name:'Peakon Strengths & Focus Areas', area:'Peakon EV', sku:'Separate License', skuType:'separate', lane:'watch', desc:'Engagement-based insights' }
+  ]
+};
+
+// ============================================
+// KPI MAP
+// ============================================
+const KPI_MAP = {
+  hr_admin: [
+    { value:'↓ 20%', label:'HR Ticket Volume', note:'Self-service deflection via AI' },
+    { value:'↓ 50%', label:'Query Resolution Time', note:'Before vs after Intelligent Answers' },
+    { value:'↑ 30%', label:'Self-Service Completion', note:'Transactions completed without HR' }
+  ],
+  talent_skills: [
+    { value:'↑ 40%', label:'Skills Profile Coverage', note:'Workers with 3+ validated skills' },
+    { value:'↓ 60%', label:'JD Drafting Time', note:'Minutes per job description' },
+    { value:'↑ 25%', label:'Candidate Match Quality', note:'Recruiter-assessed fit score' }
+  ],
+  payroll_compliance: [
+    { value:'↓ 80%', label:'Payroll Errors (pre-run)', note:'Anomalies caught before processing' },
+    { value:'↑ 75%', label:'Audit Prep Speed', note:'Payroll Agent data insights' },
+    { value:'↓ 30%', label:'Payroll Query Volume', note:'Self-resolved via Payroll Agent' }
+  ],
+  finance_manual: [
+    { value:'↓ 50%', label:'Expense Entry Time', note:'Mobile scan vs manual per claim' },
+    { value:'↓ 40%', label:'Bank Recon Hours', note:'Per period: before vs after AI' },
+    { value:'↑ 30%', label:'Cash App Speed', note:'Days to apply vs days outstanding' }
+  ],
+  workforce_planning: [
+    { value:'↓ 67%', label:'Schedule Build Time', note:'AI vs manual weekly scheduling' },
+    { value:'↑ 15%', label:'Forecast Accuracy', note:'Plan vs actual at period close' },
+    { value:'↓ 40%', label:'Manager Admin Time', note:'On scheduling vs strategic work' }
+  ]
+};
+
+// ============================================
+// PLAYBOOK MAP
+// ============================================
+const PLAYBOOK_MAP = {
+  hr_admin: [
+    'Enable Intelligent Answers & AI QuickTips. Brief HR comms team.',
+    'Baseline HR ticket volume, avg resolution time, self-service % before AI.',
+    'Activate Help AI knowledge management. Run manager awareness session.',
+    'Capture KPIs. Prepare 1-page value summary for HR leadership.'
+  ],
+  talent_skills: [
+    'Enable Skills on Worker Profiles & Job Descriptions. Audit skills taxonomy.',
+    'Activate Candidate Skills Match for open roles. Baseline screening time per req.',
+    'Enable Job Description GenAI on all new requisitions. Track drafting time.',
+    'Capture metrics. Build business case for Career Hub or HiredScore if relevant.'
+  ],
+  payroll_compliance: [
+    'Enable Pay Anomalies & Time Anomalies. Configure alert thresholds.',
+    'Run first parallel payroll with AI anomaly detection. Document findings.',
+    'Review anomaly catch rate vs pre-AI baseline. Assess Payroll Agent appetite.',
+    'Present pay error reduction data to Payroll & Compliance leadership.'
+  ],
+  finance_manual: [
+    'Enable Receipt Scanning & Expense Recommendations. Communicate to all staff.',
+    'Run parallel bank recon (manual + AI). Validate AI match rates vs manual.',
+    'Enable Cash Application Insights. Baseline AR team hours per period.',
+    'Capture all KPIs. Present finance leadership 1-page value case.'
+  ],
+  workforce_planning: [
+    'Enable Labor Demand Forecasting & Scheduling Optimisation. Train schedulers.',
+    'Run first AI-assisted schedule alongside manual. Compare accuracy & time.',
+    'Full AI scheduling rollout. Baseline manager time on scheduling tasks.',
+    'Capture schedule accuracy & manager time KPIs. Evaluate Planning Agent.'
+  ]
+};
+
+// ============================================
+// LABEL MAPS
+// ============================================
+const MODULE_LABELS = {
+  'hcm-only': 'HCM only',
+  'fins-only': 'Financials only',
+  'hcm-fins': 'HCM + Financials',
+  'hcm-fins-planning': 'HCM + Financials + Adaptive Planning',
+  'with-extras': 'Full suite + add-ons'
+};
+
+const STAGE_LABELS = {
+  'not-started': 'Not started',
+  'aware': 'Aware, not yet activated',
+  'some-live': 'Some features live',
+  'active': 'Actively adopting'
+};
+
+const PAIN_LABELS = {
+  'hr_admin': 'HR Admin Reduction',
+  'talent_skills': 'Talent & Skills',
+  'payroll_compliance': 'Payroll & Compliance',
+  'finance_manual': 'Finance Automation',
+  'workforce_planning': 'Workforce Planning'
+};
+
+const AGENT_LABELS = {
+  'not-yet': 'Start with embedded AI',
+  'one-agent': 'Open to one Agent',
+  'priority': 'Agents are a priority',
+  'all-in': 'All-in on Agents'
+};
+
+const SIZE_LABELS = {
+  'mid-market': 'Mid-market',
+  'enterprise': 'Enterprise',
+  'global-enterprise': 'Global enterprise',
+  'professional-services': 'Professional services'
+};
+
+// ============================================
+// WORKDAY FEATURES (WD_FEATURES)
+// ============================================
+const WD_FEATURES = [
+  { title:'Career Hub', product:'Talent Management', gaStatus:'GA (2026R1)', impact:'High', isAgent:false, description:'AI-powered career hub with mentor recommendations, skill-gap analysis, learning suggestions.', sku:'Included', skuType:'included'},
+  { title:'Payroll Agent', product:'Payroll', gaStatus:'GA (2026R1)', impact:'High', isAgent:true, description:'Conversational AI for payroll insights, data validation, compliance monitoring.', sku:'Agent SKU', skuType:'agent'},
+  { title:'Self Service Agent', product:'Human Capital Management', gaStatus:'GA (2026R1)', impact:'High', isAgent:true, description:'Multi-turn AI for employee/manager self-service across HCM, time, payroll, talent.', sku:'Agent SKU', skuType:'agent'},
+  { title:'Workflow Routing', product:'Platform', gaStatus:'Preview', impact:'Medium', isAgent:false, description:'AI traffic cop guiding users to correct business processes and workflows.', sku:'Included (Preview)', skuType:'preview'},
+  { title:'Pay Anomalies', product:'Payroll', gaStatus:'GA', impact:'High', isAgent:false, description:'Detects payroll anomalies before processing to prevent errors.', sku:'Included', skuType:'included'},
+  { title:'Time Anomalies', product:'Workforce Management', gaStatus:'GA', impact:'High', isAgent:false, description:'Flags unusual time entries and compliance issues.', sku:'Included', skuType:'included'},
+  { title:'Intelligent Answers', product:'HCM', gaStatus:'GA', impact:'High', isAgent:false, description:'AI-powered answers to common HR and employee questions.', sku:'Included', skuType:'included'},
+  { title:'Job Description Generation', product:'Talent Management', gaStatus:'GA', impact:'High', isAgent:false, description:'Generates job descriptions with AI assistance.', sku:'Included', skuType:'included'},
+  { title:'Candidate Skills Match', product:'Talent Management', gaStatus:'GA', impact:'High', isAgent:false, description:'Matches candidates to roles based on skills analysis.', sku:'Included', skuType:'included'},
+  { title:'Receipt Scanning for Expenses', product:'Finance', gaStatus:'GA', impact:'High', isAgent:false, description:'AI scans receipts and populates expense claims automatically.', sku:'Included', skuType:'included'},
+  { title:'AI Bank Reconciliation', product:'Finance', gaStatus:'GA', impact:'High', isAgent:false, description:'Automates bank reconciliation with AI matching.', sku:'Included', skuType:'included'},
+  { title:'Labour Demand Forecasting', product:'Workforce Management', gaStatus:'GA', impact:'High', isAgent:false, description:'AI forecasts labour demand based on historical patterns.', sku:'Included', skuType:'included'},
+  { title:'Scheduling Optimization', product:'Workforce Management', gaStatus:'GA', impact:'High', isAgent:false, description:'Automatically optimizes work schedules with AI.', sku:'Included', skuType:'included'},
+  { title:'Workday Help AI', product:'Platform', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI guidance embedded throughout Workday.', sku:'Included', skuType:'included'},
+  { title:'AI QuickTips', product:'Platform', gaStatus:'GA', impact:'Medium', isAgent:false, description:'Context-aware tips to speed up user tasks.', sku:'Included', skuType:'included'},
+  { title:'Form Completion Assistant', product:'Platform', gaStatus:'GA', impact:'Medium', isAgent:false, description:'Autocompletes form fields based on worker context.', sku:'Included', skuType:'included'},
+  { title:'Intelligent Expense Recommendations', product:'Finance', gaStatus:'GA', impact:'Medium', isAgent:false, description:'Suggests correct expense coding and allocation.', sku:'Included', skuType:'included'},
+  { title:'Suggested Skills on Worker Profile', product:'Talent Management', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI suggests missing skills for worker profiles.', sku:'Included', skuType:'included'},
+  { title:'Market Skills', product:'Talent Management', gaStatus:'GA', impact:'Medium', isAgent:false, description:'Compare skills to market benchmarks and trends.', sku:'Included', skuType:'included'},
+  { title:'Talent Highlights', product:'Talent Management', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI-generated highlights of top talent and successors.', sku:'Included', skuType:'included'},
+  { title:'Performance Summary AI Widget', product:'HCM', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI-generated performance summary widget.', sku:'Included', skuType:'included'},
+  { title:'Cash Application Insights', product:'Finance', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI applies cash to correct AR invoices.', sku:'Included', skuType:'included'},
+  { title:'FLSA & FSB Compliance Insights', product:'Workforce Management', gaStatus:'GA', impact:'Medium', isAgent:false, description:'US Fair Labor compliance monitoring and insights.', sku:'Included', skuType:'included'},
+  { title:'Conversational Scheduling', product:'Workforce Management', gaStatus:'GA', impact:'Medium', isAgent:false, description:'Chat-based scheduling assistant for managers.', sku:'Included', skuType:'included'},
+  { title:'Workday Writing Prompt', product:'Workforce Management', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI assistant for writing performance notes and feedback.', sku:'Included', skuType:'included'},
+  { title:'BP Optimize Agent', product:'Platform', gaStatus:'Preview', impact:'High', isAgent:true, description:'Optimises business processes with AI insights.', sku:'Agent SKU', skuType:'agent'},
+  { title:'Deployment Agent', product:'Platform', gaStatus:'Preview', impact:'High', isAgent:true, description:'AI assistant for Workday deployment and configuration tasks.', sku:'Agent SKU', skuType:'agent'},
+  { title:'Collection Letters', product:'Finance', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI-drafted collection letter templates for AR teams.', sku:'Included', skuType:'included'},
+  { title:'Intelligent Prompt Recommendations (AR & Cash)', product:'Finance', gaStatus:'GA', impact:'Medium', isAgent:false, description:'AI recommends AR aging and cash application priorities.', sku:'Included', skuType:'included'}
+];
+
+// ============================================
+// DETAILED ASSESSMENT DIMENSIONS (25 QUESTIONS)
+// ============================================
+const DIMS = [
+  {
+    id:'tf', code:'TF', color:'#283583', name:'Technology Foundations',
+    desc:'Is Workday configured, governed, and positioned as the core platform for AI?',
+    qs:[
+      { id:'TF1', title:'System of Record Consolidation', text:'Is Workday your authoritative system of record for HR and/or Finance with no significant parallel systems?', a:{ 1:'Multiple systems of record — Workday is one of several', 3:'Workday is primary but shadow systems exist in pockets', 5:'Workday is sole system of record; integrations are read-only or decommissioned' }, qual:'Interview HRIT/CIO to identify all parallel HR/Finance platforms still active. Review system architecture documentation and integration catalogue.', quant:'Count of active inbound integrations from external HR/Finance systems. Number of live parallel platforms in use.', report:'Integration System Audit Report — inbound EIB, Core Connector, and custom feeds grouped by source system.', auto: true },
+      { id:'TF2', title:'Tenant Configuration Health', text:'How much custom BPEL, calculated fields, and configuration debt exists in your tenant?', a:{ 1:'Heavy customisation, significant deviation from Workday standard', 3:'Some customisation, partial alignment to standard model', 5:'Minimal customisation, close to Workday standard — changes are deliberate and documented' }, qual:'Configuration review with Workday admin team. Assess rationale for customisations and existence of a technical debt register.', quant:'Count of business process customisations vs. Workday standard baseline. Number of custom calculated fields and conditional rules.', report:'Business Process Configuration Report — custom steps per process compared to standard Workday baseline.', auto: true },
+      { id:'TF3', title:'Security Architecture', text:'Does your security model support seamless data sharing with AI features (RBAC, Audit, Consent)?', a:{ 1:'Security model tightly locked; AI data sharing blocked or severely restricted', 3:'Security model partially adapted; some AI features limited by security constraints', 5:'Security model explicitly designed to enable AI; RBAC, audit, consent all configured' }, qual:'Security review with CISO/Security Architect. Assess data governance policies for AI, consent workflows, and audit readiness.', quant:'Number of security policy exceptions required to enable AI. Audit log coverage % for AI-driven actions.', report:'Security Risk Assessment — AI data access matrix and consent workflow audit.', auto: false },
+      { id:'TF4', title:'Release Adoption', text:'How quickly and systematically does your organisation adopt Workday major releases?', a:{ 1:'Slow, ad-hoc adoption; often 2+ releases behind', 3:'Follows release schedule but with gaps; some versions skipped', 5:'Proactive adoption; current release or one behind within 6 months' }, qual:'Review release history and change management process. Interview release programme lead.', quant:'Number of releases behind; months since last major update; % of features adopted per release.', report:'Workday Release Adoption Report — upgrades by module over past 36 months.', auto: true },
+      { id:'TF5', title:'API & Extend Capability', text:'How mature is your API and extend ecosystem (ISU, EIB, Connectors, extensions)?', a:{ 1:'Limited API usage; minimal integrations; weak extend maturity', 3:'Moderate API use; some custom extensions; partial governance', 5:'Strong API ecosystem; well-governed integrations; mature ISU/custom apps' }, qual:'Review API governance, integration catalogue, and custom app portfolio. Assess support model.', quant:'Count of active APIs in use, number of integrations, custom apps deployed, API uptime %.', report:'Integration Maturity Assessment — API usage by module, integration types, and custom apps.', auto: true },
+      { id:'TF6', title:'Integration Architecture', text:'How well-designed and documented is your integration architecture for AI enablement?', a:{ 1:'Ad-hoc integrations; no master data governance; tight coupling to legacy systems', 3:'Some integration standards; partial master data governance; coupling exists', 5:'Modular, documented integration patterns; strong MDM; loose coupling via cloud-native APIs' }, qual:'Review integration documentation, master data governance policies, and API strategy. Assess data lineage.', quant:'Integration complexity score, master data quality %, data lineage coverage %.', report:'Enterprise Integration Architecture Review — patterns, master data governance, coupling analysis.', auto: false }
+    ]
+  },
+  {
+    id:'ds', code:'DS', color:'#41679F', name:'Data Strategy & Readiness',
+    desc:'How complete, clean, and governed is your data for AI?',
+    qs:[
+      { id:'DS1', title:'Worker Profile Completeness', text:'How complete are core worker attributes across your population (name, role, org, manager, skills, demographics)?', a:{ 1:'Critical attributes missing in >30% of records; inconsistent data quality', 3:'Most attributes present; some gaps in 10-30% of records; inconsistent formatting', 5:'>95% completeness; consistent formats; regular validation cycles' }, qual:'Sample 100+ worker records. Check for missing and inconsistent data. Interview HR Business Partner.', quant:'% of worker population with complete core attributes. % of records with skill data vs total. Data completeness score.', report:'Workday Worker Data Quality Report — completeness and consistency by attribute and population segment.', auto: true },
+      { id:'DS2', title:'Organisational Hierarchy Integrity', text:'How accurate and complete is your organisational structure (org units, departments, reporting lines)?', a:{ 1:'Multiple conflicts in reporting lines; org structure poorly maintained; significant gaps', 3:'Generally accurate; some legacy structures or gaps in newer departments', 5:'Clean, current org structure; all employees assigned; validated quarterly' }, qual:'Review org chart vs HR records. Sample 50+ manager records. Interview HR Systems Analyst.', quant:'% of employees with assigned manager; org hierarchy depth accuracy; # of org exceptions.', report:'Organisational Hierarchy Audit — reporting line consistency, orphaned records, structural validation.', auto: true },
+      { id:'DS3', title:'Data Ownership', text:'Is there clear accountability for data quality? Do data owners exist with documented roles and responsibilities?', a:{ 1:'No data owners defined; accountability unclear; ad-hoc data management', 3:'Data owners partially defined; some documented responsibilities; inconsistent governance', 5:'Formal data stewardship model; clear roles (Stewards, Custodians, Users); regular reviews' }, qual:'Review data governance charter. Identify data owners per domain. Interview governance lead.', quant:'% of data domains with assigned steward; governance meetings per year; SLA compliance %.', report:'Data Governance Framework Assessment — stewardship model, roles, and SLA compliance.', auto: false },
+      { id:'DS4', title:'Data Validation Controls', text:'What controls exist to prevent and detect bad data (before and after entry)?', a:{ 1:'Minimal validation; errors caught after-the-fact; no proactive checks', 3:'Some validation rules in place; manual reviews for critical data', 5:'Automated pre- and post-entry validation; rule-based alerts; regular audit cycles' }, qual:'Review data validation rules in Workday, integration checks, and manual controls. Test error detection.', quant:'# of validation rules by domain; % of bad records detected pre-entry; # of data audits per year.', report:'Data Quality Controls Assessment — validation rules, detection rates, audit frequency.', auto: true },
+      { id:'DS5', title:'Reporting Foundation', text:'How mature is your reporting data model (dimensions, cubes, data warehouse)?', a:{ 1:'Fragmented reporting; ad-hoc reports; no data warehouse or cubes', 3:'Core reporting built; some data marts; partial cube structure', 5:'Modern data warehouse; well-designed cubes and dimensions; automated extracts; governed metadata' }, qual:'Review data warehouse architecture, cube design, and reporting governance. Test reporting performance.', quant:'# of reports maintained; query performance (p95 latency); data freshness SLA compliance %.', report:'Reporting Architecture Assessment — warehouse design, cubes, data freshness, governance.', auto: true },
+      { id:'DS6', title:'Historical Data Reliability', text:'How reliable and accessible is your historical data (transactions, headcount, GL entries, time)?', a:{ 1:'Limited history; data purged frequently; difficult to access historical records', 3:'Some historical data retained; accessible but inconsistent; gaps in some domains', 5:'Comprehensive history (3+ years); consistent schemas; easy access; audit trails intact' }, qual:'Review data retention policies and historical data samples. Test retrieval processes.', quant:'Years of historical data available; % of transaction history retained; data access latency.', report:'Historical Data Inventory — retention policies, completeness, access patterns by domain.', auto: true },
+      { id:'DS7', title:'Privacy & Consent Controls', text:'Do you have mechanisms for consent, data subject rights, and privacy compliance (GDPR, CCPA)?', a:{ 1:'No formal consent model; GDPR/CCPA compliance unknown or incomplete', 3:'Partial consent tracking; some privacy controls; compliance partially documented', 5:'Formal consent model; automated rights requests; privacy by design; full compliance documented' }, qual:'Review consent architecture, privacy policies, and compliance audit. Interview privacy officer.', quant:'% population with explicit consent; average rights request fulfillment time; compliance audit score.', report:'Privacy & Consent Readiness Assessment — consent tracking, compliance status, rights management.', auto: false }
+    ]
+  },
+  {
+    id:'aa', code:'AA', color:'#61A83F', name:'AI Activation & Use Cases',
+    desc:'Are you using and measuring Workday AI features?',
+    qs:[
+      { id:'AA1', title:'AI Feature Enablement', text:'How many Workday AI features are enabled and accessible to users?', a:{ 1:'0-2 AI features enabled; minimal awareness among users', 3:'3-5 AI features enabled; partial rollout; some user awareness', 5:'6+ AI features live; broad user enablement; active feature adoption' }, qual:'Audit Workday tenant AI feature flags. Review rollout communications. Interview user community.', quant:'# of AI features enabled; % of eligible users with access; # of activation campaigns.', report:'Workday AI Feature Inventory & Enablement Status — features enabled by module and user coverage.', auto: true },
+      { id:'AA2', title:'Usage vs. Enablement Gap', text:'Of the AI features you have enabled, what % are actually being used consistently?', a:{ 1:'Enabled but dormant — <10% usage; high abandon rate', 3:'Moderate usage — 20-40% of eligible users actively using', 5:'Strong adoption — 50%+ of eligible users; consistent monthly usage' }, qual:'Review feature usage telemetry (Workday Analytics). Sample user interviews on feature awareness.', quant:'Monthly active users by feature; feature usage frequency (daily/weekly/monthly); adoption velocity.', report:'Workday Feature Usage Analytics — adoption rates, monthly active users, engagement trends by feature.', auto: true },
+      { id:'AA3', title:'Use Case Definition', text:'Do you have formally documented AI use cases with clear success criteria?', a:{ 1:'Ad-hoc feature trials; no formal use case documentation; no success criteria defined', 3:'Some use cases documented; success criteria partially defined; pilot mentality', 5:'Formal use case library; success criteria and KPI targets for each; prioritised roadmap' }, qual:'Review use case repository, success criteria, and roadmap docs. Interview business stakeholders.', quant:'# of defined use cases; % with documented success criteria and KPIs; roadmap maturity score.', report:'AI Use Case & Success Criteria Inventory — use cases, target KPIs, prioritisation.', auto: false },
+      { id:'AA4', title:'Outcome Measurement', text:'Are you systematically measuring business outcomes and ROI from AI features?', a:{ 1:'No outcome tracking; AI impact unknown; no baseline KPIs established', 3:'Ad-hoc measurement; some KPIs tracked; baseline partially established', 5:'Formal measurement framework; all AI initiatives tracked; clear before/after KPI comparison' }, qual:'Review outcome measurement framework, KPI dashboards, and ROI analysis docs. Interview finance.', quant:'% of AI initiatives with tracked KPIs; frequency of KPI reviews; ROI realisation %.', report:'Workday AI Outcome Measurement Framework — KPI definitions, tracking mechanisms, ROI status.', auto: false },
+      { id:'AA5', title:'Process Readiness', text:'Are your core HR, Finance, Payroll processes designed to leverage AI (workflow, decision points)?', a:{ 1:'Processes unchanged by AI; manual handoffs; no AI integration points', 3:'Some processes adapted; partial automation; AI data feeds integrated', 5:'AI-native processes redesigned; minimal manual intervention; AI as central decision support' }, qual:'Review process documentation, automation, and AI integration points. Conduct process walk-throughs.', quant:'# of processes with AI touchpoints; % manual steps eliminated; automation coverage %.', report:'Process Readiness for AI Assessment — workflow redesign, automation coverage, integration points.', auto: false },
+      { id:'AA6', title:'Change & Adoption Management', text:'How mature is your change management approach for rolling out AI features?', a:{ 1:'Ad-hoc comms; minimal training; no adoption support; high user resistance', 3:'Basic comms plan; standard training; limited support; moderate adoption', 5:'Comprehensive change plan; tiered training; ongoing adoption support; feedback loops; champions' }, qual:'Review change management plan, training materials, adoption support. Interview change lead.', quant:'# of training sessions; % staff trained; user adoption rate; satisfaction scores; churn rate.', report:'Change & Adoption Readiness Assessment — communication plan, training coverage, support model, KPIs.', auto: false }
+    ]
+  },
+  {
+    id:'gw', code:'GW', color:'#EC6608', name:'Governance & Ways of Working',
+    desc:'Who governs AI strategy, decisions, and risk?',
+    qs:[
+      { id:'GW1', title:'Workday Product Ownership', text:'Is there a clearly assigned owner/lead for Workday product strategy and roadmap?', a:{ 1:'No clear owner; responsibility scattered across teams; no coherent strategy', 3:'Informal owner; unclear responsibilities; partial coordination', 5:'Formal Product Owner or equivalent; documented strategy; executive sponsorship' }, qual:'Identify primary Workday owner/lead. Review product strategy document. Interview leadership.', quant:'Leadership span (# of stakeholders involved); strategy update frequency; stakeholder satisfaction.', report:'Workday Product Ownership Assessment — roles, strategy clarity, executive engagement.', auto: false },
+      { id:'GW2', title:'AI Governance Framework', text:'Do you have a formal AI governance framework (policies, decision rights, risk review)?', a:{ 1:'No AI governance; ad-hoc decisions; no risk review', 3:'Emerging framework; some policies; informal risk review', 5:'Formal AI governance board; clear policies; structured risk review; documented exceptions' }, qual:'Review AI governance charter, policies, and risk register. Interview governance lead.', quant:'# of AI governance policies; governance meeting frequency; % of use cases reviewed.', report:'AI Governance Framework Assessment — governance structure, policies, decision rights, risk processes.', auto: false },
+      { id:'GW3', title:'Decision Rights for AI', text:'Is it clear who decides what AI features to enable, how, and for whom?', a:{ 1:'Unclear or scattered decision rights; no prioritisation process', 3:'Partially clear; some formal process; coordination challenges remain', 5:'Clear decision matrix; formal prioritisation process; cross-functional alignment' }, qual:'Review decision-making process documentation. Interview stakeholders (business, tech, compliance).', quant:'Prioritisation framework maturity; decision turnaround time; stakeholder alignment score.', report:'AI Decision Rights Assessment — decision matrix, prioritisation process, stakeholder alignment.', auto: false },
+      { id:'GW4', title:'Team Capability', text:'Do your teams (product, HR, IT, data, change) have the skills to manage AI adoption?', a:{ 1:'Significant skill gaps; limited AI knowledge; external dependency high', 3:'Mixed capabilities; some AI training; gaps in specific areas', 5:'Strong internal expertise; regular training; proactive upskilling; partnership with partners' }, qual:'Skills assessment interview with team leads. Review training and development plans.', quant:'% staff trained on AI; skill gap assessment score; internal vs external resource ratio.', report:'AI Capability Readiness Assessment — skill inventory, training programs, build vs buy strategy.', auto: false },
+      { id:'GW5', title:'Executive Sponsorship', text:'Is there executive-level sponsorship and commitment to AI adoption?', a:{ 1:'Low executive visibility; limited funding; competing priorities', 3:'Moderate visibility; adequate funding; some competing priorities', 5:'High executive commitment; sufficient budget; AI a strategic priority; visible leadership' }, qual:'Executive interviews. Review strategic plans and budget allocations.', quant:'AI budget as % of Workday budget; executive meeting frequency; strategic priority ranking.', report:'Executive Sponsorship Assessment — strategic alignment, budget, visible commitment.', auto: false },
+      { id:'GW6', title:'Risk & Audit Readiness', text:'Are you prepared for AI-related risks (bias, data, compliance, audit)?', a:{ 1:'No risk assessment; audit unprepared; high blind spots', 3:'Basic risk awareness; some controls; audit partially ready', 5:'Formal risk management; bias & fairness controls; audit trail; compliance validated' }, qual:'Risk assessment review. Audit interviews. Bias & fairness assessment.', quant:'Risk register completeness; audit trail coverage %; compliance validation frequency.', report:'AI Risk & Audit Readiness Assessment — risk controls, audit trails, compliance status, bias assessment.', auto: false }
+    ]
+  }
+];
+
+// ============================================
+// NAVIGATION & SCREEN FUNCTIONS
+// ============================================
+
+/** Show a specific screen by ID */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/** Start quick assessment */
+function startQuickAssessment() {
+  quickAnswers = {};
+  showScreen('screen-quick-0');
+  renderQuickQuestion(0);
+}
+
+/** Start detailed assessment */
+function startDetailedAssessment() {
+  for (const dim of DIMS) {
+    for (const q of dim.qs) {
+      scores[q.id] = 0;
+    }
+  }
+  showScreen('screen-dim-0');
+  renderDimension(0);
+}
+
+/** Render quick question */
+function renderQuickQuestion(idx) {
+  const q = QUICK_QS[idx];
+  let html = `
+    <div class="question-card">
+      <h3>${q.title}</h3>
+      <div class="option-grid">
+  `;
+  for (const opt of q.options) {
+    const cls = quickAnswers[q.id] === opt.value ? 'selected' : '';
+    html += `
+      <div class="option-btn ${cls}" onclick="selectQuickOption('${q.id}', '${opt.value}', ${idx})">
+        <strong>${opt.label}</strong><br>
+        <span style="font-size: 12px; color: #666;">${opt.desc}</span>
+      </div>
+    `;
+  }
+  html += `</div></div>`;
+  document.getElementById(`quick-q${idx}-content`).innerHTML = html;
+  updateQuickNavButtons(idx);
+}
+
+/** Select quick option */
+function selectQuickOption(qId, value, idx) {
+  quickAnswers[qId] = value;
+  renderQuickQuestion(idx);
+}
+
+/** Update quick nav buttons */
+function updateQuickNavButtons(idx) {
+  document.getElementById(`quick-next-${idx}`).disabled = !quickAnswers[QUICK_QS[idx].id];
+}
+
+/** Go to quick question */
+function gotoQuickQ(idx) {
+  renderQuickQuestion(idx);
+  showScreen(`screen-quick-${idx}`);
+}
+
+/** Render dimension */
+function renderDimension(dimIdx) {
+  const dim = DIMS[dimIdx];
+  const stepper = createStepper(dimIdx);
+  document.getElementById(`stepper-dim-${dimIdx}`).innerHTML = stepper;
+
+  let html = `<h2 style="text-align: center; margin-bottom: 30px;">${dim.code}: ${dim.name}</h2>`;
+  for (let qi = 0; qi < dim.qs.length; qi++) {
+    const q = dim.qs[qi];
+    const score = scores[q.id] || 0;
+    html += `
+      <div class="question-card" style="max-width: 800px;">
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <span style="background: ${dim.color}; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: 700;">${q.id}</span>
+        </div>
+        <h3>${q.title}</h3>
+        <p style="margin-bottom: 20px;">${q.text}</p>
+        <div class="score-selector">
+          ${[1,2,3,4,5].map(s => `<button class="score-btn ${score === s ? 'selected' : ''}" onclick="setScore('${q.id}', ${s})">${s}</button>`).join('')}
+        </div>
+        <div class="score-labels">
+          <span>Not Ready</span>
+          <span>Developing</span>
+          <span>Leading</span>
+        </div>
+        <div class="expandable">
+          <div class="expandable-header" onclick="toggleExpandable(this)">▸ Scoring guide</div>
+          <div class="expandable-content">
+            <strong>1 — Not Ready:</strong> ${q.a[1]}<br><br>
+            <strong>3 — Developing:</strong> ${q.a[3]}<br><br>
+            <strong>5 — Leading:</strong> ${q.a[5]}
+          </div>
+        </div>
+        <div class="expandable">
+          <div class="expandable-header" onclick="toggleExpandable(this)">▸ How to measure</div>
+          <div class="expandable-content">
+            <strong>Qualitative:</strong> ${q.qual}<br><br>
+            <strong>Quantitative:</strong> ${q.quant}<br><br>
+            <strong>Workday Report/Signal:</strong> ${q.report}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  document.getElementById(`dim-${dimIdx}-content`).innerHTML = html;
+  updateDimNavButtons(dimIdx);
+}
+
+/** Create stepper */
+function createStepper(active) {
+  let html = '<div class="stepper">';
+  for (let i = 0; i < 4; i++) {
+    const cls = i < active ? 'complete' : i === active ? 'active' : '';
+    html += `<div class="step ${cls}">${DIMS[i].code}: ${DIMS[i].name}</div>`;
+  }
+  html += '</div>';
+  return html;
+}
+
+/** Set score */
+function setScore(qId, value) {
+  scores[qId] = value;
+  const dimIdx = DIMS.findIndex(d => d.qs.some(q => q.id === qId));
+  renderDimension(dimIdx);
+}
+
+/** Toggle expandable */
+function toggleExpandable(el) {
+  el.classList.toggle('expanded');
+  el.nextElementSibling.classList.toggle('show');
+  el.textContent = el.classList.contains('expanded') ? 'v ' + el.textContent.substring(2) : '> ' + el.textContent.substring(2);
+}
+
+/** Update dim nav buttons */
+function updateDimNavButtons(dimIdx) {
+  const dim = DIMS[dimIdx];
+  const allAnswered = dim.qs.every(q => scores[q.id] > 0);
+  document.getElementById(`dim-next-${dimIdx}`).disabled = !allAnswered;
+}
+
+/** Go to dimension */
+function gotoDim(dimIdx) {
+  renderDimension(dimIdx);
+  showScreen(`screen-dim-${dimIdx}`);
+}
+
+/** Show measures */
+function showMeasures() {
+  prevScreen = document.querySelector('.screen.active').id;
+  showScreen('screen-measures');
+  renderMeasures();
+}
+
+/** Render measures table */
+function renderMeasures() {
+  let html = `<h2 style="margin-bottom: 20px;">Measures Reference — All 25 Questions</h2>`;
+  html += `<table class="measures-table">
+    <thead>
+      <tr>
+        <th>Question ID</th>
+        <th>Title</th>
+        <th>Qualitative Approach</th>
+        <th>Quantitative Measure</th>
+        <th>Workday Report/Signal</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  for (const dim of DIMS) {
+    html += `<tr class="dim-section"><td colspan="5">${dim.code}: ${dim.name}</td></tr>`;
+    for (const q of dim.qs) {
+      const borderClass = `border-${dim.code.toLowerCase()}`;
+      html += `<tr class="${borderClass}">
+        <td style="font-weight: 700;">${q.id}</td>
+        <td style="font-weight: 600;">${q.title}</td>
+        <td>${q.qual}</td>
+        <td>${q.quant}</td>
+        <td>${q.report}</td>
+      </tr>`;
+    }
+  }
+  html += `</tbody></table>`;
+  document.getElementById('measures-content').innerHTML = html;
+}
+
+/** Show dev notes */
+function showDevNotes() {
+  prevScreen = document.querySelector('.screen.active').id;
+  showScreen('screen-devnotes');
+  renderDevNotes();
+}
+
+/** Render dev notes */
+function renderDevNotes() {
+  const html = `
+    <h2>Developer Documentation</h2>
+
+    <h3>Product Overview</h3>
+    <p>The <strong>Workday AI Adoption Readiness Assessment</strong> is a single-page HTML application that guides organisations through evidence-based diagnostics of their Workday AI readiness. It offers two parallel paths:</p>
+    <ul>
+      <li><strong>Quick Assessment:</strong> 5 questions with feature roadmap, KPIs, and activation playbook (2 min)</li>
+      <li><strong>Detailed Assessment:</strong> 25 questions across 4 dimensions with full scorecard and recommendations (15 min)</li>
+    </ul>
+
+    <h3>Architecture</h3>
+    <p><strong>Screens (only one active at a time):</strong></p>
+    <ul>
+      <li><code>screen-landing</code> — Path selection & org name input</li>
+      <li><code>screen-quick-0</code> to <code>screen-quick-4</code> — Quick assessment (1 question per screen)</li>
+      <li><code>screen-quick-results</code> — Customer Overview with roadmap, KPIs, playbook</li>
+      <li><code>screen-dim-0</code> to <code>screen-dim-3</code> — Detailed assessment by dimension (TF, DS, AA, GW)</li>
+      <li><code>screen-results</code> — Full scorecard, dimension breakdown, priorities, features, heatmap</li>
+      <li><code>screen-measures</code> — Reference table of all 25 questions</li>
+      <li><code>screen-devnotes</code> — Developer documentation</li>
+    </ul>
+    <p><strong>Navigation:</strong> Sticky header with Measures and Help buttons. Back/Next on content screens.</p>
+
+    <h3>Data Structures</h3>
+
+    <h4>QUICK_QS</h4>
+    <p>5 quick assessment questions, each with 4-5 options:</p>
+    <div class="code-block">
+const QUICK_QS = [
+  { id: 'q-modules', title: '...', options: [{value, label, desc}, ...] },
+  // ... 4 more questions
+];
+    </div>
+
+    <h4>PAIN_FEATURES</h4>
+    <p>Features grouped by pain point (hr_admin, talent_skills, payroll_compliance, finance_manual, workforce_planning):</p>
+    <div class="code-block">
+const PAIN_FEATURES = {
+  pain_key: [
+    {name, area, sku, skuType, lane, desc},
+    ...
+  ]
+};
+    </div>
+    <p>Lanes: 'now' (quick wins), 'next' (plan ahead), 'watch' (on radar)</p>
+
+    <h4>KPI_MAP & PLAYBOOK_MAP</h4>
+    <p>KPI targets and 4-week playbook steps per pain point.</p>
+
+    <h4>WD_FEATURES</h4>
+    <p>30+ Workday AI features with title, product, status, impact, SKU type, description.</p>
+
+    <h4>DIMS</h4>
+    <p>4 dimensions with 25 questions. Each question has id, title, text, anchors (1/3/5), qual, quant, report, auto flag.</p>
+
+    <h3>Scoring Model</h3>
+    <ul>
+      <li><strong>Scale:</strong> 1-5 per question</li>
+      <li><strong>Dimension Score:</strong> Average of questions in that dimension</li>
+      <li><strong>Overall Score:</strong> Average of all 4 dimensions</li>
+      <li><strong>Levels:</strong> 4.5-5.0 = Leading, 3.5-4.4 = Developing, 2.5-3.4 = Emerging, 1.0-2.4 = Not Ready</li>
+    </ul>
+
+    <h3>How to Extend</h3>
+
+    <h4>Add a Quick Question</h4>
+    <ol>
+      <li>Add object to QUICK_QS with id, title, options[]</li>
+      <li>Add corresponding screen div (screen-quick-N)</li>
+      <li>Update logic if needed</li>
+    </ol>
+
+    <h4>Add a Detailed Question</h4>
+    <ol>
+      <li>Add to DIMS[dimIdx].qs with id, title, text, anchors, qual, quant, report, auto</li>
+      <li>Rendering is dynamic — no UI changes needed</li>
+    </ol>
+
+    <h4>Update Features</h4>
+    <ol>
+      <li>Edit WD_FEATURES array to add/remove GA features</li>
+      <li>Edit PAIN_FEATURES[painKey] for pain-specific features</li>
+      <li>Edit KPI_MAP and PLAYBOOK_MAP for targets and steps</li>
+    </ol>
+
+    <h3>Key Functions</h3>
+    <ul>
+      <li><code>showScreen(id)</code> — Switch screens</li>
+      <li><code>startQuickAssessment()</code> — Begin quick path</li>
+      <li><code>startDetailedAssessment()</code> — Begin detailed path</li>
+      <li><code>buildQuickResults()</code> — Generate roadmap output</li>
+      <li><code>buildResults()</code> — Generate full scorecard</li>
+      <li><code>calculateDimensionScores()</code> — Compute scores</li>
+      <li><code>getReadinessLevel(score)</code> — Determine level label</li>
+    </ul>
+
+    <h3>Print & Export</h3>
+    <p>Both results screens have Print buttons. CSS @media print hides nav and optimises layout. Use browser Print (Ctrl+P / Cmd+P) to save as PDF.</p>
+
+    <h3>Browser Support</h3>
+    <p>All modern browsers (Chrome, Firefox, Safari, Edge). No external dependencies. Self-contained HTML with inline CSS and JavaScript.</p>
+
+    <h3>Owner</h3>
+    <p><strong>Kainos Workday AI Center of Excellence</strong> — April 2026</p>
+  `;
+  document.getElementById('devnotes-content').innerHTML = html;
+}
+
+/** Build quick results */
+function buildQuickResults() {
+  const pain = quickAnswers['q-pain'];
+  const stage = quickAnswers['q-stage'];
+  const agentReady = quickAnswers['q-agents'];
+  const modules = quickAnswers['q-modules'];
+  const orgType = quickAnswers['q-orgtype'];
+
+  let features = [...(PAIN_FEATURES[pain] || PAIN_FEATURES.hr_admin)];
+  if (agentReady === 'not-yet') features = features.filter(f => f.skuType !== 'agent');
+  if (agentReady === 'one-agent') {
+    const withAgent = features.filter(f => f.skuType === 'agent');
+    features = features.filter(f => f.skuType !== 'agent');
+    if (withAgent.length > 0) features.push(withAgent[0]);
+  }
+
+  const now = features.filter(f => f.lane === 'now');
+  const next = features.filter(f => f.lane === 'next');
+  const watch = features.filter(f => f.lane === 'watch');
+
+  const kpis = KPI_MAP[pain] || KPI_MAP.hr_admin;
+  const playbook = PLAYBOOK_MAP[pain] || PLAYBOOK_MAP.hr_admin;
+
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  let html = `
+    <div class="print-bar">
+      <button class="btn secondary" onclick="quickAnswers = {}; showScreen('screen-quick-0'); renderQuickQuestion(0);">Edit Answers</button>
+      <button class="btn" onclick="window.print();">Print / Save as PDF</button>
+      <button class="btn success" onclick="startDetailedAssessment();">Run Detailed Assessment →</button>
+    </div>
+
+    <div class="results-hero">
+      <h1>Quick Assessment — AI Adoption Roadmap</h1>
+      <div class="meta">${orgNameEl()} — ${today}</div>
+    </div>
+
+    <div class="profile-strip">
+      <div class="profile-pill"><strong>Modules:</strong> ${MODULE_LABELS[modules]}</div>
+      <div class="profile-pill"><strong>Stage:</strong> ${STAGE_LABELS[stage]}</div>
+      <div class="profile-pill"><strong>Pain Point:</strong> ${PAIN_LABELS[pain]}</div>
+      <div class="profile-pill"><strong>Agent Readiness:</strong> ${AGENT_LABELS[agentReady]}</div>
+      <div class="profile-pill"><strong>Org Type:</strong> ${SIZE_LABELS[orgType]}</div>
+    </div>
+
+    <h2 class="section-title">Feature Roadmap</h2>
+    <div class="lanes-container">
+      <div class="lane">
+        <div class="lane-header now">CHECK NOW — Quick Wins</div>
+        <div class="lane-body">
+  `;
+
+  for (const f of now) {
+    html += `
+      <div class="feature-card">
+        <div class="title">${f.name}</div>
+        <div class="desc">${f.desc}</div>
+        <div class="feature-badges">
+          <span class="badge-small area">${f.area}</span>
+          <span class="badge-small sku">${f.sku}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div></div>
+    <div class="lane">
+      <div class="lane-header next">NEXT — Plan Ahead</div>
+      <div class="lane-body">
+  `;
+
+  for (const f of next) {
+    html += `
+      <div class="feature-card">
+        <div class="title">${f.name}</div>
+        <div class="desc">${f.desc}</div>
+        <div class="feature-badges">
+          <span class="badge-small area">${f.area}</span>
+          <span class="badge-small sku">${f.sku}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div></div>
+    <div class="lane">
+      <div class="lane-header watch">WATCH — On Radar</div>
+      <div class="lane-body">
+  `;
+
+  for (const f of watch) {
+    html += `
+      <div class="feature-card">
+        <div class="title">${f.name}</div>
+        <div class="desc">${f.desc}</div>
+        <div class="feature-badges">
+          <span class="badge-small area">${f.area}</span>
+          <span class="badge-small sku">${f.sku}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  html += `</div></div></div>
+
+    <h2 class="section-title">30-Day Activation Playbook</h2>
+    <div class="playbook-steps">
+  `;
+
+  for (let w = 0; w < playbook.length; w++) {
+    html += `
+      <div class="playbook-card">
+        <div class="week">Week ${w + 1}</div>
+        <p>${playbook[w]}</p>
+      </div>
+    `;
+  }
+
+  html += `</div>
+
+    <h2 class="section-title">KPI Targets</h2>
+    <div class="kpi-grid">
+  `;
+
+  for (const kpi of kpis) {
+    html += `
+      <div class="kpi-tile">
+        <div class="kpi-value">${kpi.value}</div>
+        <div class="kpi-label">${kpi.label}</div>
+        <div class="kpi-note">${kpi.note}</div>
+      </div>
+    `;
+  }
+
+  html += `</div>
+
+    <div class="cta-footer">
+      <p><strong>Want a deeper readiness assessment?</strong></p>
+      <button class="btn success" onclick="startDetailedAssessment();">Run the Detailed Assessment (25 questions, 15 min) →</button>
+    </div>
+  `;
+
+  document.getElementById('quick-results-content').innerHTML = html;
+  showScreen('screen-quick-results');
+}
+
+/** Build detailed results */
+function buildResults() {
+  const dimScores = calculateDimensionScores();
+  const overall = (dimScores.tf + dimScores.ds + dimScores.aa + dimScores.gw) / 4;
+  const level = getReadinessLevel(overall);
+  const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const lowestDim = Object.keys(dimScores).reduce((a, b) => dimScores[a] < dimScores[b] ? a : b);
+
+  let html = `
+    <div class="print-bar">
+      <button class="btn secondary" onclick="showScreen('screen-dim-0'); renderDimension(0);">Edit Answers</button>
+      <button class="btn secondary" onclick="showMeasures();">Measures Reference</button>
+      <button class="btn" onclick="window.print();">Print / Save as PDF</button>
+    </div>
+
+    <div class="results-hero">
+      <h1>Full AI Readiness Scorecard</h1>
+      <div class="meta">${orgNameEl()} — ${today}</div>
+    </div>
+
+    <h2 class="section-title" style="text-align: center;">Overall Readiness</h2>
+    <div style="text-align: center; margin-bottom: 40px;">
+      <div style="font-size: 72px; font-weight: 700; color: #61A83F; margin-bottom: 8px;">${overall.toFixed(2)}</div>
+      <span class="level-badge ready">${level.toUpperCase()}</span>
+    </div>
+
+    <h2 class="section-title">Dimension Scores</h2>
+    <div class="dimensions-grid">
+  `;
+
+  for (const dim of DIMS) {
+    const score = dimScores[dim.id];
+    const barWidth = (score / 5) * 100;
+    const dimLevel = getReadinessLevel(score);
+    html += `
+      <div class="dim-card ${dim.id}">
+        <div class="dim-card-header">
+          <div><h3>${dim.code}: ${dim.name}</h3></div>
+          <div class="dim-score">${score.toFixed(2)}</div>
+        </div>
+        <div class="dim-bar"><div class="dim-bar-fill" style="width: ${barWidth}%"></div></div>
+        <div class="dim-label">${dimLevel}</div>
+      </div>
+    `;
+  }
+
+  html += `</div>
+
+    <h2 class="section-title">Top 5 Priority Areas</h2>
+    <div style="max-width: 1200px; margin: 0 auto 40px; padding: 0 20px;">
+  `;
+
+  const allQs = [];
+  for (const dim of DIMS) {
+    for (const q of dim.qs) {
+      allQs.push({ ...q, dimId: dim.id, dimCode: dim.code, score: scores[q.id] });
+    }
+  }
+  const topPriorities = allQs.sort((a, b) => a.score - b.score).slice(0, 5);
+
+  for (const q of topPriorities) {
+    html += `
+      <div style="background: white; padding: 16px; margin-bottom: 12px; border-radius: 6px; border-left: 4px solid ${DIMS.find(d => d.id === q.dimId).color};">
+        <strong>${q.dimCode}: ${q.title}</strong> (Score: ${q.score}/5)<br>
+        <span style="font-size: 13px; color: #666;">${q.text}</span>
+      </div>
+    `;
+  }
+
+  html += `</div>
+
+    <h2 class="section-title">Recommended AI Features</h2>
+    <div style="max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+  `;
+
+  let recommendedFeatures = [];
+  if (lowestDim === 'tf') {
+    recommendedFeatures = WD_FEATURES.filter(f => f.isAgent).slice(0, 8);
+  } else if (lowestDim === 'ds') {
+    recommendedFeatures = WD_FEATURES.filter(f => f.product.includes('Talent') || f.product.includes('Data')).slice(0, 8);
+  } else if (lowestDim === 'aa') {
+    recommendedFeatures = WD_FEATURES.filter(f => f.gaStatus.includes('GA') && f.skuType === 'included').slice(0, 8);
+  } else {
+    recommendedFeatures = WD_FEATURES.filter(f => f.gaStatus.includes('GA') && f.skuType === 'included').slice(0, 8);
+  }
+
+  for (const f of recommendedFeatures) {
+    const impactBg = f.impact === 'High' ? 'background: #d4f4dd;' : 'background: #fff4e6;';
+    html += `
+      <div style="background: white; border-radius: 6px; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <strong>${f.title}</strong><br>
+        <span style="font-size: 12px; color: #666; display: block; margin: 6px 0;">${f.product}</span>
+        <div style="font-size: 11px; display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
+          <span style="background: var(--light-bg); padding: 2px 6px; border-radius: 2px;">${f.gaStatus}</span>
+          <span style="${impactBg} padding: 2px 6px; border-radius: 2px;">${f.impact} Impact</span>
+        </div>
+        <p style="font-size: 12px; line-height: 1.4; color: #666;">${f.description}</p>
+      </div>
+    `;
+  }
+
+  html += `</div>
+
+    <h2 class="section-title">Question Heatmap</h2>
+    <div class="heatmap">
+      <table class="heatmap-table">
+        <thead>
+          <tr>
+            <th>Question</th>
+            <th style="width: 100px;">Score</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  for (const dim of DIMS) {
+    html += `<tr style="background: ${dim.color}; color: white;"><td colspan="2"><strong>${dim.code}: ${dim.name}</strong></td></tr>`;
+    for (const q of dim.qs) {
+      const score = scores[q.id];
+      const heatClass = score <= 2 ? 'heat-1' : score <= 3 ? 'heat-3' : 'heat-5';
+      html += `
+        <tr>
+          <td>${q.id}: ${q.title}</td>
+          <td class="heatmap-cell ${heatClass}" style="font-weight: 700;">${score}</td>
+        </tr>
+      `;
+    }
+  }
+
+  html += `</tbody></table></div>`;
+
+  document.getElementById('results-content').innerHTML = html;
+  showScreen('screen-results');
+}
+
+/** Calculate dimension scores */
+function calculateDimensionScores() {
+  const result = {};
+  for (const dim of DIMS) {
+    const dimScores = dim.qs.map(q => scores[q.id] || 0);
+    result[dim.id] = dimScores.reduce((a, b) => a + b, 0) / dim.qs.length;
+  }
+  return result;
+}
+
+/** Get readiness level */
+function getReadinessLevel(score) {
+  if (score >= 4.5) return 'Leading';
+  if (score >= 3.5) return 'Developing';
+  if (score >= 2.5) return 'Emerging';
+  return 'Not Ready';
+}
+
+// Initialize on load
+window.addEventListener('load', () => {
+  showScreen('screen-landing');
+});
+</script>
+
+</body>
+</html>

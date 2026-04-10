@@ -1,0 +1,13 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp
+
+# Temp Word lock files
+~$*.docx
+
+# Vercel
+.vercel
