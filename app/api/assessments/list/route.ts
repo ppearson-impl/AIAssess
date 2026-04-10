@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const orgName = searchParams.get('orgName');
 
-    let query = supabase
+    let query = supabaseAdmin
       .from('assessments')
       .select('id, org_name, path, created_at, quick_answers, dimension_scores')
       .order('created_at', { ascending: false })

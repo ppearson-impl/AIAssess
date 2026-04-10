@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,24 +10,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email and organisation name are required' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    if (path !== 'quick' && path !== 'detailed') {
+      return NextResponse.json({ error: 'Invalid assessment path' }, { status: 400 });
+    }
+
+    const { data, error } = await supabaseAdmin
       .from('assessments')
       .insert([
         {
           email: email.toLowerCase().trim(),
-          org_name: orgName,
-          path: path, // 'quick' or 'detailed'
+          org_name: orgName.trim(),
+          path,
           quick_answers: path === 'quick' ? quickAnswers : null,
           dimension_scores: path === 'detailed' ? scores : null,
           completed_dimension: dimension,
           created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         }
       ])
       .select();
 
     if (error) {
       console.error('Supabase insert error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: error.message, details: error.details, hint: error.hint }, { status: 500 });
     }
 
     return NextResponse.json({ data: data[0], success: true }, { status: 201 });

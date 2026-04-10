@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(
   request: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('assessments')
       .select('*')
       .eq('id', id)
@@ -39,7 +39,7 @@ export async function PUT(
     const body = await request.json();
     const { quickAnswers, scores, completedDimension } = body;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('assessments')
       .update({
         quick_answers: quickAnswers,
