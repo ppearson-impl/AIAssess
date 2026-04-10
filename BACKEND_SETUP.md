@@ -64,6 +64,7 @@ npm install
 ## API Endpoints Available
 
 - **POST** `/api/assessments/save` — Save a new assessment response
+- **GET** `/api/assessments/by-email?email=user@example.com` — List all assessments by email address
 - **GET** `/api/assessments/list` — List all saved assessments (filterable by org name)
 - **GET** `/api/assessments/[id]` — Retrieve a specific assessment by ID
 - **PUT** `/api/assessments/[id]` — Update an existing assessment
@@ -90,6 +91,13 @@ console.log('Saved assessment ID:', data.id);
 const response = await fetch('/api/assessments/list?orgName=Acme');
 const { data } = await response.json();
 console.log('Found assessments:', data);
+```
+
+### List assessments by email:
+```javascript
+const response = await fetch('/api/assessments/by-email?email=user@company.com');
+const { data } = await response.json();
+console.log('User past assessments:', data);
 ```
 
 ### Retrieve a specific assessment:

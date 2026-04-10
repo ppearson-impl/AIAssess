@@ -19,6 +19,7 @@ export default function Assessment() {
   const [currentDim, setCurrentDim] = useState(0);
   const [email, setEmail] = useState('');
   const [orgName, setOrgName] = useState('');
+  const [pastAssessments, setPastAssessments] = useState<any[]>([]);
   const orgNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
@@ -105,6 +106,22 @@ export default function Assessment() {
     }
   };
 
+  const loadPastAssessments = async () => {
+    const emailVal = getEmail().trim();
+    if (!emailVal) return;
+    
+    try {
+      const response = await fetch(`/api/assessments/by-email?email=${encodeURIComponent(emailVal)}`);
+      if (response.ok) {
+        const { data } = await response.json();
+        setPastAssessments(data || []);
+        showScreen('screen-history');
+      }
+    } catch (error) {
+      console.error('Error loading assessments:', error);
+    }
+  };
+
   const renderLanding = () => (
     <div className="screen active">
       <div className="hero-gradient">
@@ -177,6 +194,17 @@ export default function Assessment() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+            {email && (
+              <div style={{textAlign: 'center', marginBottom: '20px'}}>
+                <button 
+                  className="btn secondary" 
+                  onClick={loadPastAssessments}
+                  style={{fontSize: '14px'}}
+                >
+                  📋 View My Past Assessments
+                </button>
+              </div>
+            )}
             <div className="path-cards">
               <div className="path-card green-accent">
                 <h2>Quick Assessment</h2>
@@ -428,74 +456,78 @@ export default function Assessment() {
               if (!dim || !dim.qs || dim.qs.length === 0) return <div>No questions for this dimension</div>;
               
               const progress = ((currentDim + 1) / DIMS.length) * 100;
+              const allAnswered = dim.qs.every(q => scores[q.id]);
               
               return (
                 <>
                   <div className="progress-bar"><div className="fill" style={{width: `${progress}%`}}></div></div>
-                  <h2 style={{textAlign: 'center', marginBottom: '30px'}}>{dim.code}: {dim.name} — Question {currentDim + 1} of {DIMS.length}</h2>
+                  <h2 style={{textAlign: 'center', marginBottom: '10px'}}>{dim.code}: {dim.name}</h2>
+                  <p style={{textAlign: 'center', color: '#666', marginBottom: '30px'}}>Dimension {currentDim + 1} of {DIMS.length} — {dim.qs.length} questions</p>
                   
-                  <div className="question-card" style={{borderLeft: `5px solid ${dim.color}`}}>
-                    <h3>{dim.qs[0]?.title || 'Question'}</h3>
-                    <p style={{marginBottom: '20px', color: '#666'}}>{dim.qs[0]?.qual || 'Rate your organisation on this dimension'}</p>
-                    
-                    <div className="likert-scale" style={{display: 'flex', gap: '8px', marginBottom: '30px', justifyContent: 'center', flexWrap: 'wrap'}}>
-                      {[
-                        { val: 1, label: 'Emerging', desc: 'Early stage' },
-                        { val: 2, label: 'Emerging', desc: 'Established' },
-                        { val: 3, label: 'Developing', desc: 'Good progress' },
-                        { val: 4, label: 'Advanced', desc: 'Strong execution' },
-                        { val: 5, label: 'Leading', desc: 'Industry best practice' }
-                      ].map(item => {
-                        const isSelected = scores[dim.qs[0]?.id] === item.val;
-                        const colors = ['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'];
-                        const selectedColor = colors[item.val - 1];
-                        return (
-                          <button
-                            key={item.val}
-                            className={`likert-btn ${isSelected ? 'active' : ''}`}
-                            style={{
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '100px',
-                              padding: '16px 12px',
-                              border: isSelected ? `3px solid ${selectedColor}` : '2px solid #E8E8E8',
-                              background: isSelected ? `${selectedColor}15` : '#FAFAFA',
-                              borderRadius: '12px',
-                              cursor: 'pointer',
-                              transition: 'all 0.2s ease',
-                              boxShadow: isSelected ? `0 4px 12px ${selectedColor}40` : 'none',
-                              fontWeight: isSelected ? '700' : '600',
-                              fontSize: '14px',
-                              color: isSelected ? selectedColor : '#555'
-                            }}
-                            onMouseEnter={(e) => {
-                              if (!isSelected) {
-                                e.currentTarget.style.borderColor = selectedColor;
-                                e.currentTarget.style.background = `${selectedColor}08`;
-                              }
-                            }}
-                            onMouseLeave={(e) => {
-                              if (!isSelected) {
-                                e.currentTarget.style.borderColor = '#E8E8E8';
-                                e.currentTarget.style.background = '#FAFAFA';
-                              }
-                            }}
-                            onClick={() => {
-                              const qId = dim.qs[0]?.id;
-                              if (qId) {
-                                setScores(prev => ({ ...prev, [qId]: item.val }));
-                              }
-                            }}
-                          >
-                            <div style={{fontSize: '22px', fontWeight: '800', marginBottom: '4px', color: selectedColor}}>{item.val}</div>
-                            <div style={{fontSize: '12px', fontWeight: '600', marginBottom: '2px'}}>{item.label}</div>
-                            <div style={{fontSize: '11px', color: '#999', lineHeight: '1.2'}}>{item.desc}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
+                  <div style={{maxWidth: '900px', margin: '0 auto'}}>
+                    {dim.qs.map((q, idx) => (
+                      <div key={q.id} style={{marginBottom: '40px', paddingBottom: '30px', borderBottom: idx === dim.qs.length - 1 ? 'none' : '1px solid #eee'}}>
+                        <div style={{marginBottom: '20px'}}>
+                          <div style={{fontSize: '14px', color: '#999', marginBottom: '5px'}}>Question {idx + 1} of {dim.qs.length}</div>
+                          <h3 style={{marginBottom: '8px', fontSize: '18px'}}>{q.title}</h3>
+                          <p style={{color: '#666', fontSize: '14px'}}>{q.qual}</p>
+                        </div>
+                        
+                        <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center'}}>
+                          {[
+                            { val: 1, label: 'Emerging', desc: 'Early stage' },
+                            { val: 2, label: 'Emerging', desc: 'Established' },
+                            { val: 3, label: 'Developing', desc: 'Good progress' },
+                            { val: 4, label: 'Advanced', desc: 'Strong execution' },
+                            { val: 5, label: 'Leading', desc: 'Best practice' }
+                          ].map(item => {
+                            const isSelected = scores[q.id] === item.val;
+                            const colors = ['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'];
+                            const selectedColor = colors[item.val - 1];
+                            return (
+                              <button
+                                key={item.val}
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  width: '80px',
+                                  padding: '12px 8px',
+                                  border: isSelected ? `3px solid ${selectedColor}` : '2px solid #E8E8E8',
+                                  background: isSelected ? `${selectedColor}15` : '#FAFAFA',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.2s ease',
+                                  boxShadow: isSelected ? `0 4px 12px ${selectedColor}40` : 'none',
+                                  fontWeight: isSelected ? '700' : '600',
+                                  fontSize: '12px',
+                                  color: isSelected ? selectedColor : '#555'
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.borderColor = selectedColor;
+                                    e.currentTarget.style.background = `${selectedColor}08`;
+                                  }
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.borderColor = '#E8E8E8';
+                                    e.currentTarget.style.background = '#FAFAFA';
+                                  }
+                                }}
+                                onClick={() => {
+                                  setScores(prev => ({ ...prev, [q.id]: item.val }));
+                                }}
+                              >
+                                <div style={{fontSize: '18px', fontWeight: '800', marginBottom: '2px', color: selectedColor}}>{item.val}</div>
+                                <div style={{fontSize: '10px'}}>{item.label}</div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="nav-buttons">
@@ -504,7 +536,7 @@ export default function Assessment() {
                     </button>
                     <button 
                       className="btn" 
-                      disabled={!scores[dim.qs[0]?.id]}
+                      disabled={!allAnswered}
                       onClick={() => currentDim < DIMS.length - 1 ? gotoDimension(currentDim + 1) : showScreen('screen-results')}
                     >
                       {currentDim === DIMS.length - 1 ? 'View Results →' : 'Next Dimension →'}
@@ -550,6 +582,51 @@ export default function Assessment() {
                 </div>
               );
             })()}
+          </div>
+        )}
+
+        {/* HISTORY SCREEN */}
+        {currentScreen === 'screen-history' && (
+          <div className="screen active">
+            <div style={{maxWidth: '900px', margin: '0 auto', padding: '0 20px'}}>
+              <h2>Your Past Assessments</h2>
+              <p style={{color: '#666', marginBottom: '20px'}}>Showing assessments for: <strong>{getEmail()}</strong></p>
+              
+              {pastAssessments && pastAssessments.length > 0 ? (
+                <div style={{display: 'grid', gap: '15px', marginBottom: '30px'}}>
+                  {pastAssessments.map((assessment: any) => (
+                    <div 
+                      key={assessment.id}
+                      style={{
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        padding: '16px',
+                        background: '#f9f9f9',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <div style={{fontWeight: '600', marginBottom: '5px'}}>{assessment.org_name}</div>
+                        <div style={{fontSize: '13px', color: '#666'}}>
+                          {assessment.path === 'quick' ? '⚡ Quick Assessment' : '📊 Detailed Assessment'}
+                          {' '} · {new Date(assessment.created_at).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <div style={{fontSize: '12px', color: '#999'}}>ID: {assessment.id.substring(0, 8)}...</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{textAlign: 'center', padding: '40px', color: '#999'}}>
+                  <p>No assessments found for this email.</p>
+                  <p>Complete an assessment to see it here.</p>
+                </div>
+              )}
+              
+              <button className="btn secondary" onClick={() => showScreen('screen-landing')}>← Back to Home</button>
+            </div>
           </div>
         )}
 
