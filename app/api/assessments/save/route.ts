@@ -4,12 +4,17 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { orgName, path, quickAnswers, scores, dimension } = body;
+    const { email, orgName, path, quickAnswers, scores, dimension } = body;
+
+    if (!email || !orgName) {
+      return NextResponse.json({ error: 'Email and organisation name are required' }, { status: 400 });
+    }
 
     const { data, error } = await supabase
       .from('assessments')
       .insert([
         {
+          email: email.toLowerCase().trim(),
           org_name: orgName,
           path: path, // 'quick' or 'detailed'
           quick_answers: path === 'quick' ? quickAnswers : null,

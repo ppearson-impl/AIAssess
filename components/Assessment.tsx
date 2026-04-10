@@ -18,8 +18,17 @@ export default function Assessment() {
   const [currentQuickQ, setCurrentQuickQ] = useState(0);
   const [currentDim, setCurrentDim] = useState(0);
   const orgNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
 
   const getOrgName = () => orgNameRef.current?.value || 'Your Organisation';
+  const getEmail = () => emailRef.current?.value || '';
+
+  const isFormValid = () => {
+    const email = getEmail().trim();
+    const org = getOrgName().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return email && org && emailRegex.test(email);
+  };
 
   const showScreen = (id: string) => {
     setCurrentScreen(id);
@@ -58,6 +67,40 @@ export default function Assessment() {
     if (score >= 3.5) return 'Developing';
     if (score >= 2.5) return 'Emerging';
     return 'Not Ready';
+  };
+
+  const saveAssessment = async (path: string, dimension?: number) => {
+    const email = getEmail().trim();
+    const org = getOrgName().trim();
+    
+    if (!email || !org) {
+      console.warn('Missing email or organisation name');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/assessments/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          orgName: org,
+          path,
+          quickAnswers: path === 'quick' ? quickAnswers : null,
+          scores: path === 'detailed' ? scores : null,
+          dimension,
+        })
+      });
+
+      if (response.ok) {
+        const { data } = await response.json();
+        console.log('Assessment saved:', data.id);
+      } else {
+        console.error('Failed to save assessment');
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+    }
   };
 
   const renderLanding = () => (
@@ -119,18 +162,41 @@ export default function Assessment() {
                 placeholder="e.g. Acme Corp, Global Finance Ltd"
               />
             </div>
+            <div className="org-name-input">
+              <label htmlFor="email">Email Address</label>
+              <input 
+                ref={emailRef}
+                type="email" 
+                id="email" 
+                placeholder="your.email@company.com"
+              />
+            </div>
             <div className="path-cards">
               <div className="path-card green-accent">
                 <h2>Quick Assessment</h2>
                 <div className="badge">5 questions · 2 minutes</div>
                 <p>Rapid AI adoption snapshot with feature roadmap and activation playbook.</p>
-                <button className="btn success" onClick={startQuickAssessment}>Start Quick Assessment →</button>
+                <button 
+                  className="btn success" 
+                  disabled={!isFormValid()}
+                  onClick={startQuickAssessment}
+                  style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed'}}
+                >
+                  Start Quick Assessment →
+                </button>
               </div>
               <div className="path-card">
                 <h2>Detailed Assessment</h2>
                 <div className="badge">25 questions · 15 minutes</div>
                 <p>Full readiness scorecard across 4 dimensions with priority recommendations.</p>
-                <button className="btn" onClick={startDetailedAssessment}>Start Detailed Assessment →</button>
+                <button 
+                  className="btn" 
+                  disabled={!isFormValid()}
+                  onClick={startDetailedAssessment}
+                  style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed'}}
+                >
+                  Start Detailed Assessment →
+                </button>
               </div>
             </div>
           </div>
@@ -208,6 +274,9 @@ export default function Assessment() {
               const kpis = KPI_MAP[pain] || KPI_MAP.hr_admin;
               const playbook = PLAYBOOK_MAP[pain] || PLAYBOOK_MAP.hr_admin;
               const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+              // Save assessment to backend
+              saveAssessment('quick');
 
               return (
                 <>
@@ -444,30 +513,37 @@ export default function Assessment() {
         {/* DETAILED RESULTS SCREEN */}
         {currentScreen === 'screen-results' && (
           <div className="screen active">
-            <div style={{maxWidth: '1000px', margin: '0 auto', padding: '0 20px'}}>
-              <div className="results-hero">
-                <h1>Detailed Assessment — Readiness Scorecard</h1>
-                <div className="meta">{getOrgName()} — Comprehensive 4-Dimension Analysis</div>
-              </div>
+            {(() => {
+              // Save detailed assessment to backend
+              saveAssessment('detailed', currentDim);
               
-              <h2 style={{marginTop: '40px'}}>Dimension Scores</h2>
-              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px'}}>
-                {DIMS.map(dim => {
-                  const dimScores = dim.qs.map(q => scores[q.id] || 0).filter(s => s > 0);
-                  const avgScore = dimScores.length > 0 ? (dimScores.reduce((a, b) => a + b, 0) / dimScores.length).toFixed(1) : '—';
-                  return (
-                    <div key={dim.id} style={{border: `2px solid ${dim.color}`, borderRadius: '8px', padding: '20px'}}>
-                      <div style={{fontSize: '12px', color: '#666', textTransform: 'uppercase', letterSpacing: '1px'}}>{dim.code}</div>
-                      <div style={{fontSize: '28px', fontWeight: 'bold', color: dim.color, margin: '10px 0'}}>{avgScore}</div>
-                      <div style={{fontSize: '14px', fontWeight: '600'}}>{dim.name}</div>
-                      <div style={{fontSize: '12px', color: '#666', marginTop: '10px'}}>{getReadinessLevel(parseFloat(avgScore as string))}</div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              <button className="btn secondary" onClick={() => showScreen('screen-landing')}>← Back to Home</button>
-            </div>
+              return (
+                <div style={{maxWidth: '1000px', margin: '0 auto', padding: '0 20px'}}>
+                  <div className="results-hero">
+                    <h1>Detailed Assessment — Readiness Scorecard</h1>
+                    <div className="meta">{getOrgName()} — Comprehensive 4-Dimension Analysis</div>
+                  </div>
+                  
+                  <h2 style={{marginTop: '40px'}}>Dimension Scores</h2>
+                  <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px'}}>
+                    {DIMS.map(dim => {
+                      const dimScores = dim.qs.map(q => scores[q.id] || 0).filter(s => s > 0);
+                      const avgScore = dimScores.length > 0 ? (dimScores.reduce((a, b) => a + b, 0) / dimScores.length).toFixed(1) : '—';
+                      return (
+                        <div key={dim.id} style={{border: `2px solid ${dim.color}`, borderRadius: '8px', padding: '20px'}}>
+                          <div style={{fontSize: '12px', color: '#666', textTransform: 'uppercase', letterSpacing: '1px'}}>{dim.code}</div>
+                          <div style={{fontSize: '28px', fontWeight: 'bold', color: dim.color, margin: '10px 0'}}>{avgScore}</div>
+                          <div style={{fontSize: '14px', fontWeight: '600'}}>{dim.name}</div>
+                          <div style={{fontSize: '12px', color: '#666', marginTop: '10px'}}>{getReadinessLevel(parseFloat(avgScore as string))}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  <button className="btn secondary" onClick={() => showScreen('screen-landing')}>← Back to Home</button>
+                </div>
+              );
+            })()}
           </div>
         )}
 

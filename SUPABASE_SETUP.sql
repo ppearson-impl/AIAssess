@@ -1,6 +1,7 @@
 -- Create assessments table for storing all assessment responses
 CREATE TABLE IF NOT EXISTS assessments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email TEXT NOT NULL,
   org_name TEXT NOT NULL,
   path TEXT NOT NULL CHECK (path IN ('quick', 'detailed')),
   quick_answers JSONB,
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS assessments (
 );
 
 -- Create index for faster queries
+CREATE INDEX IF NOT EXISTS idx_assessments_email ON assessments(email);
 CREATE INDEX IF NOT EXISTS idx_assessments_org_name ON assessments(org_name);
 CREATE INDEX IF NOT EXISTS idx_assessments_created_at ON assessments(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_assessments_path ON assessments(path);
