@@ -54,47 +54,6 @@ export default function Assessment() {
     return 'Not Ready';
   };
 
-        <h2 className="section-title">Question Heatmap</h2>
-        <div className="heatmap">
-          <table className="heatmap-table">
-            <thead>
-              <tr>
-                <th>Question</th>
-                <th style={{width: '100px'}}>Score</th>
-              </tr>
-            </thead>
-            <tbody>
-              {DIMS.map(dim => (
-                <React.Fragment key={dim.id}>
-                  <tr style={{background: dim.color, color: 'white'}}>
-                    <td colSpan={2}><strong>{dim.code}: {dim.name}</strong></td>
-                  </tr>
-                  {dim.qs.map(q => {
-                    const score = scores[q.id] || 0;
-                    const heatClass = score <= 2 ? 'heat-1' : score <= 3 ? 'heat-3' : 'heat-5';
-                    return (
-                      <tr key={q.id}>
-                        <td>{q.id}: {q.title}</td>
-                        <td className={`heatmap-cell ${heatClass}`} style={{fontWeight: '700'}}>{score}</td>
-                      </tr>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
-  };
-
-  const getReadinessLevel = (score: number): string => {
-    if (score >= 4.5) return 'Leading';
-    if (score >= 3.5) return 'Developing';
-    if (score >= 2.5) return 'Emerging';
-    return 'Not Ready';
-  };
-
   const renderLanding = () => (
     <div className="screen active">
       <div className="hero-gradient">
