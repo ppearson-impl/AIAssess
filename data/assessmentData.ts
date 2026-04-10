@@ -213,7 +213,49 @@ export const DIMS = [
     id:'tf', code:'TF', color:'#283583', name:'Technology Foundations',
     desc:'Is Workday configured, governed, and positioned as the core platform for AI?',
     qs:[
-      { id:'TF1', title:'System of Record Consolidation', text:'Is Workday your authoritative system of record for HR and/or Finance with no significant parallel systems?', a:{ 1:'Multiple systems of record — Workday is one of several', 3:'Workday is primary but shadow systems exist in pockets', 5:'Workday is sole system of record; integrations are read-only or decommissioned' }, qual:'Interview HRIT/CIO to identify all parallel HR/Finance platforms still active. Review system architecture documentation and integration catalogue.', quant:'Count of active inbound integrations from external HR/Finance systems. Number of live parallel platforms in use.', report:'Integration System Audit Report — inbound EIB, Core Connector, and custom feeds grouped by source system.', auto: true },
+      { id:'TF1', title:'System of Record Consolidation', qual:'Is Workday your authoritative system of record for HR and/or Finance with no significant parallel systems?' },
+      { id:'TF2', title:'Data Quality & Governance', qual:'Who owns data validation, and how often are data quality audits performed?' },
+      { id:'TF3', title:'Integration Health', qual:'What percentage of your integrations are automated vs. manual, and what is the failure rate?' },
+      { id:'TF4', title:'Platform Stability & Uptime', qual:'What is your Workday environment uptime percentage over the last 12 months?' },
+      { id:'TF5', title:'API & Extensibility Readiness', qual:'Do you have documented APIs, webhooks, and extensibility standards in place?' },
+      { id:'TF6', title:'Security & Compliance Infrastructure', qual:'Is your Workday environment compliant with SOC 2, ISO 27001, and GDPR requirements?' }
+    ]
+  },
+  {
+    id:'ds', code:'DS', color:'#E67E22', name:'Data & Supervision',
+    desc:'Do you have clean, governed data and quality processes for AI to learn from?',
+    qs:[
+      { id:'DS1', title:'Master Data Governance', qual:'Do you have a documented master data management (MDM) strategy and governance council?' },
+      { id:'DS2', title:'Field Completeness & Accuracy', qual:'What is the average data completeness for critical HR/Finance fields (employee records, compensation, project allocations)?' },
+      { id:'DS3', title:'Historical Data Retention', qual:'How many years of clean historical data do you maintain for analytics and pattern recognition?' },
+      { id:'DS4', title:'Audit & Change Tracking', qual:'Are all sensitive data changes logged, auditable, and retained for 7+ years?' },
+      { id:'DS5', title:'Duplicate & Anomaly Detection', qual:'Do you have automated processes to detect and remediate duplicate records and data anomalies?' },
+      { id:'DS6', title:'Data Classification & Lineage', qual:'Is data classified by sensitivity level, and can you trace data lineage across systems?' },
+      { id:'DS7', title:'Reporting & Analytics Infrastructure', qual:'Do you have a centralized data warehouse (Workday Financials Cube, BI360, or similar) for analytics?' }
+    ]
+  },
+  {
+    id:'aa', code:'AA', color:'#27AE60', name:'Analytics & Adoption',
+    desc:'Do you measure adoption and continuously improve based on data insights?',
+    qs:[
+      { id:'AA1', title:'Job Execution & Adoption Metrics', qual:'Who tracks job execution times, feature adoption rates, and user engagement?' },
+      { id:'AA2', title:'User Proficiency Assessment', qual:'Do you assess user proficiency levels and provide targeted training to low-usage groups?' },
+      { id:'AA3', title:'Feature Coverage & Utilization', qual:'What percentage of Workday features are actively used, and how is this measured?' },
+      { id:'AA4', title:'Business Process Optimization', qual:'Do you have KPIs for each major business process (hires, payroll cycles, expense reimbursements)?' },
+      { id:'AA5', title:'Continuous Improvement Cadence', qual:'How often do you review adoption metrics and iterate on processes (monthly, quarterly, annually)?' },
+      { id:'AA6', title:'Change Management Discipline', qual:'Do you have a change control board and documented process for rolling out new configurations?' }
+    ]
+  },
+  {
+    id:'gw', code:'GW', color:'#9B59B6', name:'Governance & Workforce Readiness',
+    desc:'Are your teams skilled, empowered, and structured to operate AI-enabled processes?',
+    qs:[
+      { id:'GW1', title:'Cross-Functional AI Steering', qual:'Do you have a steering committee with representatives from HR, Finance, IT, and Business?' },
+      { id:'GW2', title:'Workday Centre of Excellence', qual:'Is there a dedicated CoE or functional lead responsible for driving continuous improvement?' },
+      { id:'GW3', title:'Change Management & Communication', qual:'What is your formal change management process, and how do you communicate AI feature rollouts to users?' },
+      { id:'GW4', title:'Skills & Capability Planning', qual:'Do you have a skills matrix and training plan for Workday technical and functional roles?' },
+      { id:'GW5', title:'Vendor Management & Roadmap Alignment', qual:'How frequently do you align with Workday services and review product roadmaps?' },
+      { id:'GW6', title:'Executive Sponsorship & Investment', qual:'Is there executive sponsorship for AI transformation, and is budget allocated for training and tools?' }
     ]
   }
 ];
