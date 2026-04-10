@@ -1,0 +1,26 @@
+-- Create assessments table for storing all assessment responses
+CREATE TABLE IF NOT EXISTS assessments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_name TEXT NOT NULL,
+  path TEXT NOT NULL CHECK (path IN ('quick', 'detailed')),
+  quick_answers JSONB,
+  dimension_scores JSONB,
+  completed_dimension INTEGER,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  notes TEXT
+);
+
+-- Create index for faster queries
+CREATE INDEX IF NOT EXISTS idx_assessments_org_name ON assessments(org_name);
+CREATE INDEX IF NOT EXISTS idx_assessments_created_at ON assessments(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_assessments_path ON assessments(path);
+
+-- Enable Row Level Security (optional but recommended)
+ALTER TABLE assessments ENABLE ROW LEVEL SECURITY;
+
+-- Create policy to allow anonymous inserts/reads (for public assessments)
+CREATE POLICY "Allow anonymous access" ON assessments
+  FOR ALL
+  USING (true)
+  WITH CHECK (true);
