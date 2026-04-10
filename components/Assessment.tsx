@@ -1048,7 +1048,7 @@ export default function Assessment() {
                     <p>{dim.content.summary}</p>
                     <div className="recommendation-subtitle">What to do next</div>
                     <ul className="recommendation-list">
-                      {dim.content.actions.map((action) => (
+                      {dim.content.actions.map((action: any) => (
                         <li key={action}>{action}</li>
                       ))}
                     </ul>
