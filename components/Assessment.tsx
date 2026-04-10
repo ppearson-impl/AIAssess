@@ -1,13 +1,20 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { QUICK_QS, PAIN_FEATURES, KPI_MAP, PLAYBOOK_MAP, DIMS, WD_FEATURES, MODULE_LABELS, STAGE_LABELS, PAIN_LABELS, AGENT_LABELS, SIZE_LABELS } from '@/data/assessmentData';
+
+interface QuickAnswers {
+  [key: string]: string;
+}
+
+interface Scores {
+  [key: string]: number;
+}
 
 export default function Assessment() {
   const [currentScreen, setCurrentScreen] = useState('screen-landing');
-  const [quickAnswers, setQuickAnswers] = useState({});
-  const [scores, setScores] = useState({});
-  const [orgName, setOrgName] = useState('');
+  const [quickAnswers, setQuickAnswers] = useState<QuickAnswers>({});
+  const [scores, setScores] = useState<Scores>({});
   const orgNameRef = useRef<HTMLInputElement>(null);
 
   const getOrgName = () => orgNameRef.current?.value || 'Your Organisation';
@@ -54,13 +61,13 @@ export default function Assessment() {
   };
 
   const buildQuickResults = () => {
-    const pain = quickAnswers['q-pain'] || 'hr_admin';
-    const stage = quickAnswers['q-stage'] || 'not-started';
-    const agentReady = quickAnswers['q-agents'] || 'not-yet';
-    const modules = quickAnswers['q-modules'] || 'hcm-only';
-    const orgType = quickAnswers['q-orgtype'] || 'mid-market';
+    const pain = (quickAnswers['q-pain'] || 'hr_admin') as keyof typeof PAIN_FEATURES;
+    const stage = (quickAnswers['q-stage'] || 'not-started') as keyof typeof STAGE_LABELS;
+    const agentReady = (quickAnswers['q-agents'] || 'not-yet') as keyof typeof AGENT_LABELS;
+    const modules = (quickAnswers['q-modules'] || 'hcm-only') as keyof typeof MODULE_LABELS;
+    const orgType = (quickAnswers['q-orgtype'] || 'mid-market') as keyof typeof SIZE_LABELS;
 
-    let features = [...(PAIN_FEATURES[pain as keyof typeof PAIN_FEATURES] || PAIN_FEATURES.hr_admin)];
+    let features = [...(PAIN_FEATURES[pain] || PAIN_FEATURES.hr_admin)];
     if (agentReady === 'not-yet') features = features.filter(f => f.skuType !== 'agent');
     if (agentReady === 'one-agent') {
       const withAgent = features.filter(f => f.skuType === 'agent');
@@ -72,8 +79,8 @@ export default function Assessment() {
     const next = features.filter(f => f.lane === 'next');
     const watch = features.filter(f => f.lane === 'watch');
 
-    const kpis = KPI_MAP[pain as keyof typeof KPI_MAP] || KPI_MAP.hr_admin;
-    const playbook = PLAYBOOK_MAP[pain as keyof typeof PLAYBOOK_MAP] || PLAYBOOK_MAP.hr_admin;
+    const kpis = KPI_MAP[pain] || KPI_MAP.hr_admin;
+    const playbook = PLAYBOOK_MAP[pain] || PLAYBOOK_MAP.hr_admin;
 
     const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -91,11 +98,11 @@ export default function Assessment() {
         </div>
 
         <div className="profile-strip">
-          <div className="profile-pill"><strong>Modules:</strong> {MODULE_LABELS[modules as keyof typeof MODULE_LABELS]}</div>
-          <div className="profile-pill"><strong>Stage:</strong> {STAGE_LABELS[stage as keyof typeof STAGE_LABELS]}</div>
-          <div className="profile-pill"><strong>Pain Point:</strong> {PAIN_LABELS[pain as keyof typeof PAIN_LABELS]}</div>
-          <div className="profile-pill"><strong>Agent Readiness:</strong> {AGENT_LABELS[agentReady as keyof typeof AGENT_LABELS]}</div>
-          <div className="profile-pill"><strong>Org Type:</strong> {SIZE_LABELS[orgType as keyof typeof SIZE_LABELS]}</div>
+          <div className="profile-pill"><strong>Modules:</strong> {MODULE_LABELS[modules]}</div>
+          <div className="profile-pill"><strong>Stage:</strong> {STAGE_LABELS[stage]}</div>
+          <div className="profile-pill"><strong>Pain Point:</strong> {PAIN_LABELS[pain]}</div>
+          <div className="profile-pill"><strong>Agent Readiness:</strong> {AGENT_LABELS[agentReady]}</div>
+          <div className="profile-pill"><strong>Org Type:</strong> {SIZE_LABELS[orgType]}</div>
         </div>
 
         <h2 className="section-title">Feature Roadmap</h2>
