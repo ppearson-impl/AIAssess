@@ -222,71 +222,73 @@ export default function Assessment() {
       <div className="container">
         {/* LANDING SCREEN */}
         {currentScreen === 'screen-landing' && (
-          <div className="screen active">
-            <div className="hero-gradient">
+          <div className="landing-container">
+            <div className="landing-left">
               <h1>Workday AI Adoption Readiness Assessment</h1>
               <p>Evidence-based diagnostics for your AI journey</p>
-            </div>
-            <div className="org-name-input">
-              <label htmlFor="org-name">Organisation Name</label>
-              <input 
-                ref={orgNameRef}
-                type="text" 
-                id="org-name" 
-                placeholder="e.g. Acme Corp, Global Finance Ltd"
-                value={orgName}
-                onChange={(e) => setOrgName(e.target.value)}
-              />
-            </div>
-            <div className="org-name-input">
-              <label htmlFor="email">Email Address</label>
-              <input 
-                ref={emailRef}
-                type="email" 
-                id="email" 
-                placeholder="your.email@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            {email && (
-              <div style={{textAlign: 'center', marginBottom: '20px'}}>
-                <button 
-                  className="btn secondary" 
-                  onClick={loadPastAssessments}
-                  style={{fontSize: '14px'}}
-                >
-                  📋 View My Past Assessments
-                </button>
+              <div className="path-cards">
+                <div className="path-card green-accent">
+                  <h2>Quick Assessment</h2>
+                  <div className="badge">5 questions · 2 minutes</div>
+                  <p>Rapid AI adoption snapshot with feature roadmap and activation playbook.</p>
+                  <button 
+                    className="btn success" 
+                    disabled={!isFormValid()}
+                    onClick={startQuickAssessment}
+                    style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed', width: '100%'}}
+                  >
+                    Start Quick Assessment →
+                  </button>
+                </div>
+                <div className="path-card">
+                  <h2>Detailed Assessment</h2>
+                  <div className="badge">25 questions · 15 minutes</div>
+                  <p>Full readiness scorecard across 4 dimensions with priority recommendations.</p>
+                  <button 
+                    className="btn" 
+                    disabled={!isFormValid()}
+                    onClick={startDetailedAssessment}
+                    style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed', width: '100%'}}
+                  >
+                    Start Detailed Assessment →
+                  </button>
+                </div>
               </div>
-            )}
-            <div className="path-cards">
-              <div className="path-card green-accent">
-                <h2>Quick Assessment</h2>
-                <div className="badge">5 questions · 2 minutes</div>
-                <p>Rapid AI adoption snapshot with feature roadmap and activation playbook.</p>
-                <button 
-                  className="btn success" 
-                  disabled={!isFormValid()}
-                  onClick={startQuickAssessment}
-                  style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed'}}
-                >
-                  Start Quick Assessment →
-                </button>
+            </div>
+            <div className="landing-right">
+              <div className="org-name-input">
+                <label htmlFor="org-name">Organisation Name</label>
+                <input 
+                  ref={orgNameRef}
+                  type="text" 
+                  id="org-name" 
+                  placeholder="e.g. Acme Corp, Global Finance Ltd"
+                  value={orgName}
+                  onChange={(e) => setOrgName(e.target.value)}
+                />
               </div>
-              <div className="path-card">
-                <h2>Detailed Assessment</h2>
-                <div className="badge">25 questions · 15 minutes</div>
-                <p>Full readiness scorecard across 4 dimensions with priority recommendations.</p>
-                <button 
-                  className="btn" 
-                  disabled={!isFormValid()}
-                  onClick={startDetailedAssessment}
-                  style={{opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed'}}
-                >
-                  Start Detailed Assessment →
-                </button>
+              <div className="org-name-input">
+                <label htmlFor="email">Email Address</label>
+                <input 
+                  ref={emailRef}
+                  type="email" 
+                  id="email" 
+                  placeholder="your.email@company.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
+              {email && (
+                <div style={{textAlign: 'center', marginTop: '20px', width: '100%'}}>
+                  <button 
+                    className="btn secondary" 
+                    onClick={loadPastAssessments}
+                    style={{fontSize: '14px', width: '100%'}}
+                  >
+                    📋 View My Past Assessments
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -588,7 +590,7 @@ export default function Assessment() {
                             const isSelected = scores[q.id] === item.val;
                             const colors = ['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'];
                             const selectedColor = colors[item.val - 1];
-                            const answerText = q.scoring ? q.scoring[item.val as keyof typeof q.scoring] : item.label;
+                            const answerText = q.scoring ? (q.scoring as any)[item.val] || item.label : item.label;
                             return (
                               <button
                                 key={item.val}
