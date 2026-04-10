@@ -17,17 +17,19 @@ export default function Assessment() {
   const [scores, setScores] = useState<Scores>({});
   const [currentQuickQ, setCurrentQuickQ] = useState(0);
   const [currentDim, setCurrentDim] = useState(0);
+  const [email, setEmail] = useState('');
+  const [orgName, setOrgName] = useState('');
   const orgNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
 
-  const getOrgName = () => orgNameRef.current?.value || 'Your Organisation';
-  const getEmail = () => emailRef.current?.value || '';
+  const getOrgName = () => orgName || orgNameRef.current?.value || 'Your Organisation';
+  const getEmail = () => email || emailRef.current?.value || '';
 
   const isFormValid = () => {
-    const email = getEmail().trim();
-    const org = getOrgName().trim();
+    const emailVal = email.trim();
+    const orgVal = orgName.trim();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return email && org && emailRegex.test(email);
+    return emailVal && orgVal && emailRegex.test(emailVal);
   };
 
   const showScreen = (id: string) => {
@@ -160,6 +162,8 @@ export default function Assessment() {
                 type="text" 
                 id="org-name" 
                 placeholder="e.g. Acme Corp, Global Finance Ltd"
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
               />
             </div>
             <div className="org-name-input">
@@ -169,6 +173,8 @@ export default function Assessment() {
                 type="email" 
                 id="email" 
                 placeholder="your.email@company.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="path-cards">
@@ -288,7 +294,7 @@ export default function Assessment() {
 
                   <div className="results-hero">
                     <h1>Quick Assessment — AI Adoption Roadmap</h1>
-                    <div className="meta">{orgNameRef.current?.value || 'Your Organisation'} — {today}</div>
+                    <div className="meta">{getOrgName()} — {today}</div>
                   </div>
 
                   <div className="profile-strip">
