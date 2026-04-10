@@ -363,35 +363,63 @@ export default function Assessment() {
                     <h3>{dim.qs[0]?.title || 'Question'}</h3>
                     <p style={{marginBottom: '20px', color: '#666'}}>{dim.qs[0]?.qual || 'Rate your organisation on this dimension'}</p>
                     
-                    <div className="score-buttons" style={{display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginBottom: '20px'}}>
-                      {[1, 2, 3, 4, 5].map(score => (
-                        <button
-                          key={score}
-                          className={`score-btn ${scores[dim.qs[0]?.id] === score ? 'selected' : ''}`}
-                          style={{
-                            padding: '15px',
-                            border: scores[dim.qs[0]?.id] === score ? `2px solid ${dim.color}` : '1px solid #ddd',
-                            background: scores[dim.qs[0]?.id] === score ? dim.color : '#fff',
-                            color: scores[dim.qs[0]?.id] === score ? 'white' : '#333',
-                            borderRadius: '8px',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            fontSize: '16px'
-                          }}
-                          onClick={() => {
-                            const qId = dim.qs[0]?.id;
-                            if (qId) {
-                              setScores(prev => ({ ...prev, [qId]: score }));
-                            }
-                          }}
-                        >
-                          {score === 1 && 'Emerging'}
-                          {score === 2 && 'Emerging'}
-                          {score === 3 && 'Developing'}
-                          {score === 4 && 'Advanced'}
-                          {score === 5 && 'Leading'}
-                        </button>
-                      ))}
+                    <div className="likert-scale" style={{display: 'flex', gap: '8px', marginBottom: '30px', justifyContent: 'center', flexWrap: 'wrap'}}>
+                      {[
+                        { val: 1, label: 'Emerging', desc: 'Early stage' },
+                        { val: 2, label: 'Emerging', desc: 'Established' },
+                        { val: 3, label: 'Developing', desc: 'Good progress' },
+                        { val: 4, label: 'Advanced', desc: 'Strong execution' },
+                        { val: 5, label: 'Leading', desc: 'Industry best practice' }
+                      ].map(item => {
+                        const isSelected = scores[dim.qs[0]?.id] === item.val;
+                        const colors = ['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'];
+                        const selectedColor = colors[item.val - 1];
+                        return (
+                          <button
+                            key={item.val}
+                            className={`likert-btn ${isSelected ? 'active' : ''}`}
+                            style={{
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '100px',
+                              padding: '16px 12px',
+                              border: isSelected ? `3px solid ${selectedColor}` : '2px solid #E8E8E8',
+                              background: isSelected ? `${selectedColor}15` : '#FAFAFA',
+                              borderRadius: '12px',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              boxShadow: isSelected ? `0 4px 12px ${selectedColor}40` : 'none',
+                              fontWeight: isSelected ? '700' : '600',
+                              fontSize: '14px',
+                              color: isSelected ? selectedColor : '#555'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.borderColor = selectedColor;
+                                e.currentTarget.style.background = `${selectedColor}08`;
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (!isSelected) {
+                                e.currentTarget.style.borderColor = '#E8E8E8';
+                                e.currentTarget.style.background = '#FAFAFA';
+                              }
+                            }}
+                            onClick={() => {
+                              const qId = dim.qs[0]?.id;
+                              if (qId) {
+                                setScores(prev => ({ ...prev, [qId]: item.val }));
+                              }
+                            }}
+                          >
+                            <div style={{fontSize: '22px', fontWeight: '800', marginBottom: '4px', color: selectedColor}}>{item.val}</div>
+                            <div style={{fontSize: '12px', fontWeight: '600', marginBottom: '2px'}}>{item.label}</div>
+                            <div style={{fontSize: '11px', color: '#999', lineHeight: '1.2'}}>{item.desc}</div>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
