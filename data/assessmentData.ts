@@ -213,49 +213,49 @@ export const DIMS = [
     id:'tf', code:'TF', color:'#283583', name:'Technology Foundations',
     desc:'Is Workday configured, governed, and positioned as the core platform for AI?',
     qs:[
-      { id:'TF1', title:'System of Record Consolidation', qual:'Is Workday your authoritative system of record for HR and/or Finance with no significant parallel systems?' },
-      { id:'TF2', title:'Data Quality & Governance', qual:'Who owns data validation, and how often are data quality audits performed?' },
-      { id:'TF3', title:'Integration Health', qual:'What percentage of your integrations are automated vs. manual, and what is the failure rate?' },
-      { id:'TF4', title:'Platform Stability & Uptime', qual:'What is your Workday environment uptime percentage over the last 12 months?' },
-      { id:'TF5', title:'API & Extensibility Readiness', qual:'Do you have documented APIs, webhooks, and extensibility standards in place?' },
-      { id:'TF6', title:'Security & Compliance Infrastructure', qual:'Is your Workday environment compliant with SOC 2, ISO 27001, and GDPR requirements?' }
+      { id:'TF1', title:'System of Record Consolidation', qual:'Is Workday your authoritative system of record for HR and/or Finance with no significant parallel systems?', scoring:{ 1:'Multiple systems of record; Workday is one of several', 2:'Workday primary but parallel shadow systems exist', 3:'Workday is primary; some legacy integrations remain', 4:'Workday is primary with <5% parallel usage', 5:'Workday is sole system of record; integrations are read-only' } },
+      { id:'TF2', title:'Data Quality & Governance', qual:'Who owns data validation, and how often are data quality audits performed?', scoring:{ 1:'No formal data governance; ad-hoc quality checks', 2:'Basic governance exists; audits quarterly or less', 3:'Documented data governance; semi-annual audits', 4:'Strong governance; quarterly audits with assigned DQ owner', 5:'Comprehensive governance; monthly audits + real-time monitoring' } },
+      { id:'TF3', title:'Integration Health', qual:'What percentage of your integrations are automated vs. manual, and what is the failure rate?', scoring:{ 1:'<30% automated; >10% failure rate', 2:'30-50% automated; 5-10% failure rate', 3:'50-70% automated; 2-5% failure rate', 4:'70-90% automated; <2% failure rate', 5:'>90% automated; <0.5% failure rate' } },
+      { id:'TF4', title:'Platform Stability & Uptime', qual:'What is your Workday environment uptime percentage over the last 12 months?', scoring:{ 1:'<95% uptime', 2:'95-97% uptime', 3:'97-98.5% uptime', 4:'98.5-99.5% uptime', 5:'>99.5% uptime' } },
+      { id:'TF5', title:'API & Extensibility Readiness', qual:'Do you have documented APIs, webhooks, and extensibility standards in place?', scoring:{ 1:'No documented standards; ad-hoc custom development', 2:'Some APIs documented; inconsistent standards', 3:'Core APIs documented; basic extensibility guidelines', 4:'All APIs documented; robust extensibility framework', 5:'Enterprise-grade API governance; webhooks, SDKs, standards' } },
+      { id:'TF6', title:'Security & Compliance Infrastructure', qual:'Is your Workday environment compliant with SOC 2, ISO 27001, and GDPR requirements?', scoring:{ 1:'No formal certifications; limited compliance controls', 2:'Single certification (SOC 2 or ISO 27001); GDPR baseline', 3:'Two certifications; GDPR compliant but gaps remain', 4:'SOC 2 + ISO 27001; GDPR + regional compliance met', 5:'All certifications current; continuous compliance monitoring' } }
     ]
   },
   {
     id:'ds', code:'DS', color:'#E67E22', name:'Data & Supervision',
     desc:'Do you have clean, governed data and quality processes for AI to learn from?',
     qs:[
-      { id:'DS1', title:'Master Data Governance', qual:'Do you have a documented master data management (MDM) strategy and governance council?' },
-      { id:'DS2', title:'Field Completeness & Accuracy', qual:'What is the average data completeness for critical HR/Finance fields (employee records, compensation, project allocations)?' },
-      { id:'DS3', title:'Historical Data Retention', qual:'How many years of clean historical data do you maintain for analytics and pattern recognition?' },
-      { id:'DS4', title:'Audit & Change Tracking', qual:'Are all sensitive data changes logged, auditable, and retained for 7+ years?' },
-      { id:'DS5', title:'Duplicate & Anomaly Detection', qual:'Do you have automated processes to detect and remediate duplicate records and data anomalies?' },
-      { id:'DS6', title:'Data Classification & Lineage', qual:'Is data classified by sensitivity level, and can you trace data lineage across systems?' },
-      { id:'DS7', title:'Reporting & Analytics Infrastructure', qual:'Do you have a centralized data warehouse (Workday Financials Cube, BI360, or similar) for analytics?' }
+      { id:'DS1', title:'Master Data Governance', qual:'Do you have a documented master data management (MDM) strategy and governance council?', scoring:{ 1:'No MDM strategy; no governance council', 2:'Basic MDM awareness; informal governance', 3:'Documented MDM strategy; governance council meets quarterly', 4:'Formal MDM program; governance council meets monthly', 5:'Mature MDM strategy; active council; integrated tools' } },
+      { id:'DS2', title:'Field Completeness & Accuracy', qual:'What is the average data completeness for critical HR/Finance fields?', scoring:{ 1:'<70% completeness; high error rates', 2:'70-80% completeness; known data quality issues', 3:'80-90% completeness; periodic reconciliation', 4:'90-95% completeness; regular validation', 5:'>95% completeness; continuous validation rules' } },
+      { id:'DS3', title:'Historical Data Retention', qual:'How many years of clean historical data do you maintain?', scoring:{ 1:'<1 year of clean data', 2:'1-2 years of clean data', 3:'2-3 years of clean data', 4:'3-5 years of clean data', 5:'>5 years of clean, auditable data' } },
+      { id:'DS4', title:'Audit & Change Tracking', qual:'Are all sensitive data changes logged, auditable, and retained for 7+ years?', scoring:{ 1:'Limited audit trails; <1 year retention', 2:'Basic audit logging; 1-3 years retention', 3:'Audit logs captured; 3-5 years retention', 4:'Complete audit trails; 7-year retention', 5:'Immutable audit logs; 7+ year retention + analytics' } },
+      { id:'DS5', title:'Duplicate & Anomaly Detection', qual:'Do you have automated processes to detect and remediate duplicates?', scoring:{ 1:'Manual detection only; high duplicate rates', 2:'Basic duplicate checks; semi-automated remediation', 3:'Automated duplicate detection; quarterly cleanup', 4:'Real-time duplicate prevention + monthly audits', 5:'AI-powered anomaly detection + auto-remediation' } },
+      { id:'DS6', title:'Data Classification & Lineage', qual:'Is data classified by sensitivity level with traceable lineage?', scoring:{ 1:'No classification; no lineage tracking', 2:'Basic classification; limited lineage visibility', 3:'Classified PII; lineage for tier-1 fields', 4:'All data classified; most lineage mapped', 5:'Full data classification + complete lineage + auto-discovery' } },
+      { id:'DS7', title:'Reporting & Analytics Infrastructure', qual:'Do you have a centralized data warehouse for analytics?', scoring:{ 1:'No centralized warehouse; point-to-point queries', 2:'Basic data warehouse; limited refresh frequency', 3:'Workday Financials Cube or equivalent; daily refresh', 4:'Mature warehouse (BI360, Adaptive Insights); real-time refresh', 5:'Enterprise DW platform; unified AI/BI; continuous ingestion' } }
     ]
   },
   {
     id:'aa', code:'AA', color:'#27AE60', name:'Analytics & Adoption',
     desc:'Do you measure adoption and continuously improve based on data insights?',
     qs:[
-      { id:'AA1', title:'Job Execution & Adoption Metrics', qual:'Who tracks job execution times, feature adoption rates, and user engagement?' },
-      { id:'AA2', title:'User Proficiency Assessment', qual:'Do you assess user proficiency levels and provide targeted training to low-usage groups?' },
-      { id:'AA3', title:'Feature Coverage & Utilization', qual:'What percentage of Workday features are actively used, and how is this measured?' },
-      { id:'AA4', title:'Business Process Optimization', qual:'Do you have KPIs for each major business process (hires, payroll cycles, expense reimbursements)?' },
-      { id:'AA5', title:'Continuous Improvement Cadence', qual:'How often do you review adoption metrics and iterate on processes (monthly, quarterly, annually)?' },
-      { id:'AA6', title:'Change Management Discipline', qual:'Do you have a change control board and documented process for rolling out new configurations?' }
+      { id:'AA1', title:'Job Execution & Adoption Metrics', qual:'Who tracks job execution times, feature adoption rates, and user engagement?', scoring:{ 1:'No formal tracking; anecdotal awareness', 2:'Basic reports generated ad-hoc', 3:'Monthly adoption reports; basic metrics', 4:'Dashboard with key adoption metrics; weekly reviews', 5:'Real-time adoption monitoring + predictive analytics' } },
+      { id:'AA2', title:'User Proficiency Assessment', qual:'Do you assess user proficiency levels and provide targeted training?', scoring:{ 1:'No proficiency assessment; no targeted training', 2:'Annual training; basic competency checks', 3:'Proficiency survey; training for low-usage groups', 4:'Regular proficiency assessment; targeted coaching', 5:'AI-powered learning paths; personalized training + certification' } },
+      { id:'AA3', title:'Feature Coverage & Utilization', qual:'What percentage of Workday features are actively used?', scoring:{ 1:'<50% feature utilization', 2:'50-65% utilization', 3:'65-75% utilization', 4:'75-85% utilization', 5:'>85% utilization; continuous innovation' } },
+      { id:'AA4', title:'Business Process Optimization', qual:'Do you have KPIs for each major business process?', scoring:{ 1:'No formal KPIs; process-level metrics missing', 2:'KPIs for major processes only; annual review', 3:'KPIs for all major processes; quarterly review', 4:'KPIs tracked; monthly reporting & optimization', 5:'Real-time KPI dashboard; continuous process improvement' } },
+      { id:'AA5', title:'Continuous Improvement Cadence', qual:'How often do you review metrics and iterate on processes?', scoring:{ 1:'Ad-hoc or annual reviews', 2:'Quarterly reviews', 3:'Quarterly reviews + semi-annual process optimization', 4:'Monthly reviews + monthly optimizations', 5:'Weekly reviews + continuous optimization' } },
+      { id:'AA6', title:'Change Management Discipline', qual:'Do you have a formal change control process?', scoring:{ 1:'No formal change process; ad-hoc changes', 2:'Basic change board; loose documentation', 3:'Documented change process; change board meets monthly', 4:'Formal change board; all changes tracked & tested', 5:'Rigorous CAB process; automated testing + rollback capability' } }
     ]
   },
   {
     id:'gw', code:'GW', color:'#9B59B6', name:'Governance & Workforce Readiness',
     desc:'Are your teams skilled, empowered, and structured to operate AI-enabled processes?',
     qs:[
-      { id:'GW1', title:'Cross-Functional AI Steering', qual:'Do you have a steering committee with representatives from HR, Finance, IT, and Business?' },
-      { id:'GW2', title:'Workday Centre of Excellence', qual:'Is there a dedicated CoE or functional lead responsible for driving continuous improvement?' },
-      { id:'GW3', title:'Change Management & Communication', qual:'What is your formal change management process, and how do you communicate AI feature rollouts to users?' },
-      { id:'GW4', title:'Skills & Capability Planning', qual:'Do you have a skills matrix and training plan for Workday technical and functional roles?' },
-      { id:'GW5', title:'Vendor Management & Roadmap Alignment', qual:'How frequently do you align with Workday services and review product roadmaps?' },
-      { id:'GW6', title:'Executive Sponsorship & Investment', qual:'Is there executive sponsorship for AI transformation, and is budget allocated for training and tools?' }
+      { id:'GW1', title:'Cross-Functional AI Steering', qual:'Do you have a steering committee with cross-functional representation?', scoring:{ 1:'No steering committee', 2:'Informal steering; HR + IT only', 3:'Steering committee; HR, IT, Finance present', 4:'Active steering committee; meets monthly', 5:'Executive steering committee; strategic roadmap + budget approval' } },
+      { id:'GW2', title:'Workday Centre of Excellence', qual:'Is there a dedicated CoE or functional lead for continuous improvement?', scoring:{ 1:'No CoE; no assigned responsibility', 2:'Part-time CoE lead; informal structure', 3:'Dedicated CoE; meets quarterly', 4:'Dedicated CoE team; monthly alignment', 5:'Mature CoE; embedded in operations + innovation pipeline' } },
+      { id:'GW3', title:'Change Management & Communication', qual:'What is your formal change management process?', scoring:{ 1:'Informal communication; no change methodology', 2:'Email-based communication; basic documentation', 3:'Formal comms plan for major changes; stakeholder groups', 4:'Structured change methodology; town halls + training', 5:'Change management office; Prosci/ADKAR framework + analytics' } },
+      { id:'GW4', title:'Skills & Capability Planning', qual:'Do you have a skills matrix and training plan?', scoring:{ 1:'No formal skills planning', 2:'Basic skills awareness; ad-hoc training', 3:'Skills matrix for core roles; annual training plan', 4:'Comprehensive skills matrix; quarterly training updates', 5:'AI-powered learning platform; personalized skills development' } },
+      { id:'GW5', title:'Vendor Management & Roadmap Alignment', qual:'How frequently do you align with Workday on roadmaps?', scoring:{ 1:'Ad-hoc vendor contact', 2:'Annual business reviews', 3:'Semi-annual business reviews + roadmap discussion', 4:'Quarterly business reviews; aligned roadmap', 5:'Monthly strategic aligned; co-innovation with Workday' } },
+      { id:'GW6', title:'Executive Sponsorship & Investment', qual:'Is there executive sponsorship and allocated budget?', scoring:{ 1:'No executive sponsorship; minimal budget', 2:'Basic sponsorship; budget allocated annually', 3:'Strong sponsorship; 3-year roadmap + annual budget', 4:'C-level sponsorship; strategic budget allocation', 5:'CEO-level sponsorship; transformational budget + innovation fund' } }
     ]
   }
 ];

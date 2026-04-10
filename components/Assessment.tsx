@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { QUICK_QS, PAIN_FEATURES, KPI_MAP, PLAYBOOK_MAP, DIMS, WD_FEATURES, MODULE_LABELS, STAGE_LABELS, PAIN_LABELS, AGENT_LABELS, SIZE_LABELS } from '@/data/assessmentData';
 
 interface QuickAnswers {
@@ -20,8 +20,63 @@ export default function Assessment() {
   const [email, setEmail] = useState('');
   const [orgName, setOrgName] = useState('');
   const [pastAssessments, setPastAssessments] = useState<any[]>([]);
+  const [editingDims, setEditingDims] = useState<any>(JSON.parse(JSON.stringify(DIMS)));
+  const [isEditMode, setIsEditMode] = useState(false);
   const orgNameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
+
+  // Load custom measures for the organization on mount and when orgName changes
+  useEffect(() => {
+    if (orgName.trim()) {
+      loadCustomMeasures();
+    }
+  }, [orgName]);
+
+  const loadCustomMeasures = async () => {
+    if (!orgName.trim()) return;
+    
+    try {
+      const response = await fetch(`/api/measures/by-org?org_name=${encodeURIComponent(orgName.trim())}`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.data?.dims_config) {
+          setEditingDims(result.data.dims_config);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading custom measures:', error);
+    }
+  };
+
+  const saveCustomMeasures = async () => {
+    const org = getOrgName().trim();
+    if (!org) {
+      alert('Please enter an organisation name');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/measures/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          org_name: org,
+          dims_config: editingDims,
+          created_by: getEmail() || 'anonymous',
+        })
+      });
+
+      if (response.ok) {
+        alert('✓ Scoring guidance updated successfully!');
+        setIsEditMode(false);
+      } else {
+        alert('Failed to save changes. Check console for details.');
+      }
+    } catch (error) {
+      console.error('Error saving measures:', error);
+      alert('Error saving changes: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    }
+  };
 
   const getOrgName = () => orgName || orgNameRef.current?.value || 'Your Organisation';
   const getEmail = () => email || emailRef.current?.value || '';
@@ -417,33 +472,82 @@ export default function Assessment() {
         {currentScreen === 'screen-measures' && (
           <div className="screen active">
             <div style={{maxWidth: '1200px', margin: '0 auto 40px', padding: '0 20px'}}>
-              <h2 style={{marginBottom: '20px'}}>Measures Reference — Assessment Questions</h2>
-              <table className="measures-table">
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
+                <h2>Measures Reference — Assessment Questions</h2>
+                <button 
+                  className={`btn ${isEditMode ? 'danger' : 'secondary'}`}
+                  onClick={() => setIsEditMode(!isEditMode)}
+                  style={{fontSize: '13px', padding: '8px 12px'}}
+                >
+                  {isEditMode ? '✓ Done Editing' : '✎ Edit Scoring'}
+                </button>
+              </div>
+              
+              <table className="measures-table" style={{borderCollapse: 'collapse', width: '100%'}}>
                 <thead>
                   <tr>
                     <th>Question ID</th>
                     <th>Title</th>
                     <th>Qualitative Approach</th>
+                    {isEditMode && <th>Score Guidance</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {DIMS.map(dim => (
+                  {(isEditMode ? editingDims : DIMS).map(dim => (
                     <React.Fragment key={dim.id}>
                       <tr style={{background: dim.color, color: 'white'}}>
-                        <td colSpan={3}><strong>{dim.code}: {dim.name}</strong></td>
+                        <td colSpan={isEditMode ? 4 : 3}><strong>{dim.code}: {dim.name}</strong></td>
                       </tr>
                       {dim.qs.map(q => (
-                        <tr key={q.id} className={`border-${dim.code.toLowerCase()}`}>
-                          <td style={{fontWeight: '700'}}>{q.id}</td>
-                          <td style={{fontWeight: '600'}}>{q.title}</td>
-                          <td>{q.qual}</td>
+                        <tr key={q.id} className={`border-${dim.code.toLowerCase()}`} style={{borderBottom: '1px solid #ddd'}}>
+                          <td style={{fontWeight: '700', padding: '12px', width: '80px'}}>{q.id}</td>
+                          <td style={{fontWeight: '600', padding: '12px', minWidth: '200px'}}>{q.title}</td>
+                          <td style={{padding: '12px', width: '300px'}}>{q.qual}</td>
+                          {isEditMode && (
+                            <td style={{padding: '12px', maxWidth: '400px', fontSize: '12px'}}>
+                              {q.scoring ? (
+                                <div style={{display: 'grid', gap: '4px', maxHeight: '200px', overflowY: 'auto'}}>
+                                  {[1, 2, 3, 4, 5].map(score => (
+                                    <input 
+                                      key={score}
+                                      type="text"
+                                      value={q.scoring[score as keyof typeof q.scoring] || ''}
+                                      onChange={(e) => {
+                                        const newDims = JSON.parse(JSON.stringify(editingDims));
+                                        const dimIndex = newDims.findIndex((d: any) => d.id === dim.id);
+                                        const qIndex = newDims[dimIndex].qs.findIndex((question: any) => question.id === q.id);
+                                        newDims[dimIndex].qs[qIndex].scoring[score] = e.target.value;
+                                        setEditingDims(newDims);
+                                      }}
+                                      style={{fontSize: '11px', padding: '4px', border: '1px solid #ddd', borderRadius: '4px'}}
+                                      placeholder={`Level ${score} guidance...`}
+                                    />
+                                  ))}
+                                </div>
+                              ) : (
+                                <span style={{color: '#999'}}>No scoring guidance</span>
+                              )}
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </React.Fragment>
                   ))}
                 </tbody>
               </table>
-              <button className="btn secondary" style={{marginTop: '20px'}} onClick={() => showScreen('screen-landing')}>← Back to Home</button>
+              
+              <div style={{marginTop: '20px'}}>
+                {isEditMode && (
+                  <button 
+                    className="btn success"
+                    onClick={saveCustomMeasures}
+                    style={{marginRight: '10px'}}
+                  >
+                    💾 Save All Changes
+                  </button>
+                )}
+                <button className="btn secondary" onClick={() => showScreen('screen-landing')}>← Back to Home</button>
+              </div>
             </div>
           </div>
         )}
@@ -526,6 +630,21 @@ export default function Assessment() {
                             );
                           })}
                         </div>
+                        
+                        {/* Scoring Guidance */}
+                        {q.scoring && (
+                          <div style={{marginTop: '20px', padding: '16px', background: '#f0f7ff', borderRadius: '8px', borderLeft: `4px solid ${dim.color}`}}>
+                            <div style={{fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '10px'}}>📊 Scoring Guide:</div>
+                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px'}}>
+                              {[1, 2, 3, 4, 5].map(score => (
+                                <div key={score} style={{fontSize: '12px', padding: '8px', background: '#fff', borderRadius: '4px', borderLeft: `3px solid ${['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'][score - 1]}`}}>
+                                  <div style={{fontWeight: '600', marginBottom: '3px'}}>Level {score}:</div>
+                                  <div style={{color: '#555', lineHeight: '1.4'}}>{q.scoring[score as keyof typeof q.scoring]}</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
