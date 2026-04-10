@@ -588,6 +588,7 @@ export default function Assessment() {
                             const isSelected = scores[q.id] === item.val;
                             const colors = ['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'];
                             const selectedColor = colors[item.val - 1];
+                            const answerText = q.scoring ? q.scoring[item.val as keyof typeof q.scoring] : item.label;
                             return (
                               <button
                                 key={item.val}
@@ -596,7 +597,7 @@ export default function Assessment() {
                                   flexDirection: 'column',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  width: '80px',
+                                  minWidth: '140px',
                                   padding: '12px 8px',
                                   border: isSelected ? `3px solid ${selectedColor}` : '2px solid #E8E8E8',
                                   background: isSelected ? `${selectedColor}15` : '#FAFAFA',
@@ -605,7 +606,7 @@ export default function Assessment() {
                                   transition: 'all 0.2s ease',
                                   boxShadow: isSelected ? `0 4px 12px ${selectedColor}40` : 'none',
                                   fontWeight: isSelected ? '700' : '600',
-                                  fontSize: '12px',
+                                  fontSize: '11px',
                                   color: isSelected ? selectedColor : '#555'
                                 }}
                                 onMouseEnter={(e) => {
@@ -624,8 +625,8 @@ export default function Assessment() {
                                   setScores(prev => ({ ...prev, [q.id]: item.val }));
                                 }}
                               >
-                                <div style={{fontSize: '18px', fontWeight: '800', marginBottom: '2px', color: selectedColor}}>{item.val}</div>
-                                <div style={{fontSize: '10px'}}>{item.label}</div>
+                                <div style={{fontSize: '16px', fontWeight: '800', marginBottom: '4px', color: selectedColor}}>Level {item.val}</div>
+                                <div style={{fontSize: '10px', lineHeight: '1.3', textAlign: 'center'}}>{answerText}</div>
                               </button>
                             );
                           })}
