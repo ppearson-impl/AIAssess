@@ -16,6 +16,7 @@ export default function Assessment() {
   const [quickAnswers, setQuickAnswers] = useState<QuickAnswers>({});
   const [scores, setScores] = useState<Scores>({});
   const [currentQuickQ, setCurrentQuickQ] = useState(0);
+  const [currentDim, setCurrentDim] = useState(0);
   const orgNameRef = useRef<HTMLInputElement>(null);
 
   const getOrgName = () => orgNameRef.current?.value || 'Your Organisation';
@@ -45,6 +46,11 @@ export default function Assessment() {
   const gotoQuickQ = (idx: number) => {
     setCurrentQuickQ(idx);
     showScreen(`screen-quick-${idx}`);
+  };
+
+  const gotoDimension = (idx: number) => {
+    setCurrentDim(idx);
+    showScreen(`screen-dim-${idx}`);
   };
 
   const getReadinessLevel = (score: number): string => {
@@ -339,6 +345,104 @@ export default function Assessment() {
           </div>
         )}
 
+        {/* DETAILED ASSESSMENT DIMENSION SCREENS */}
+        {currentScreen.startsWith('screen-dim-') && currentScreen !== 'screen-results' && (
+          <div className="screen active">
+            {(() => {
+              const dim = DIMS[currentDim];
+              if (!dim || !dim.qs || dim.qs.length === 0) return <div>No questions for this dimension</div>;
+              
+              const progress = ((currentDim + 1) / DIMS.length) * 100;
+              
+              return (
+                <>
+                  <div className="progress-bar"><div className="fill" style={{width: `${progress}%`}}></div></div>
+                  <h2 style={{textAlign: 'center', marginBottom: '30px'}}>{dim.code}: {dim.name} — Question {currentDim + 1} of {DIMS.length}</h2>
+                  
+                  <div className="question-card" style={{borderLeft: `5px solid ${dim.color}`}}>
+                    <h3>{dim.qs[0]?.title || 'Question'}</h3>
+                    <p style={{marginBottom: '20px', color: '#666'}}>{dim.qs[0]?.qual || 'Rate your organisation on this dimension'}</p>
+                    
+                    <div className="score-buttons" style={{display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', marginBottom: '20px'}}>
+                      {[1, 2, 3, 4, 5].map(score => (
+                        <button
+                          key={score}
+                          className={`score-btn ${scores[dim.qs[0]?.id] === score ? 'selected' : ''}`}
+                          style={{
+                            padding: '15px',
+                            border: scores[dim.qs[0]?.id] === score ? `2px solid ${dim.color}` : '1px solid #ddd',
+                            background: scores[dim.qs[0]?.id] === score ? dim.color : '#fff',
+                            color: scores[dim.qs[0]?.id] === score ? 'white' : '#333',
+                            borderRadius: '8px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            fontSize: '16px'
+                          }}
+                          onClick={() => {
+                            const qId = dim.qs[0]?.id;
+                            if (qId) {
+                              setScores(prev => ({ ...prev, [qId]: score }));
+                            }
+                          }}
+                        >
+                          {score === 1 && 'Emerging'}
+                          {score === 2 && 'Emerging'}
+                          {score === 3 && 'Developing'}
+                          {score === 4 && 'Advanced'}
+                          {score === 5 && 'Leading'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="nav-buttons">
+                    <button className="btn secondary" onClick={() => currentDim > 0 ? gotoDimension(currentDim - 1) : showScreen('screen-landing')}>
+                      ← Back
+                    </button>
+                    <button 
+                      className="btn" 
+                      disabled={!scores[dim.qs[0]?.id]}
+                      onClick={() => currentDim < DIMS.length - 1 ? gotoDimension(currentDim + 1) : showScreen('screen-results')}
+                    >
+                      {currentDim === DIMS.length - 1 ? 'View Results →' : 'Next Dimension →'}
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* DETAILED RESULTS SCREEN */}
+        {currentScreen === 'screen-results' && (
+          <div className="screen active">
+            <div style={{maxWidth: '1000px', margin: '0 auto', padding: '0 20px'}}>
+              <div className="results-hero">
+                <h1>Detailed Assessment — Readiness Scorecard</h1>
+                <div className="meta">{getOrgName()} — Comprehensive 4-Dimension Analysis</div>
+              </div>
+              
+              <h2 style={{marginTop: '40px'}}>Dimension Scores</h2>
+              <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px'}}>
+                {DIMS.map(dim => {
+                  const dimScores = dim.qs.map(q => scores[q.id] || 0).filter(s => s > 0);
+                  const avgScore = dimScores.length > 0 ? (dimScores.reduce((a, b) => a + b, 0) / dimScores.length).toFixed(1) : '—';
+                  return (
+                    <div key={dim.id} style={{border: `2px solid ${dim.color}`, borderRadius: '8px', padding: '20px'}}>
+                      <div style={{fontSize: '12px', color: '#666', textTransform: 'uppercase', letterSpacing: '1px'}}>{dim.code}</div>
+                      <div style={{fontSize: '28px', fontWeight: 'bold', color: dim.color, margin: '10px 0'}}>{avgScore}</div>
+                      <div style={{fontSize: '14px', fontWeight: '600'}}>{dim.name}</div>
+                      <div style={{fontSize: '12px', color: '#666', marginTop: '10px'}}>{getReadinessLevel(parseFloat(avgScore as string))}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <button className="btn secondary" onClick={() => showScreen('screen-landing')}>← Back to Home</button>
+            </div>
+          </div>
+        )}
+
         {/* DEV NOTES SCREEN */}
         {currentScreen === 'screen-devnotes' && (
           <div className="screen active">
@@ -352,15 +456,17 @@ export default function Assessment() {
                 <li>screen-landing — Path selection & org name input ✓</li>
                 <li>screen-quick-0 to screen-quick-4 — Quick assessment (1 question per screen) ✓</li>
                 <li>screen-quick-results — Quick results with roadmap, KPIs, playbook ✓</li>
+                <li>screen-dim-0 to screen-dim-3 — Detailed assessment (1 dimension per screen) ✓</li>
+                <li>screen-results — Detailed results scorecard ✓</li>
                 <li>screen-measures — Reference table of assessment questions ✓</li>
                 <li>screen-devnotes — Developer documentation ✓</li>
               </ul>
               <h3>Next Steps</h3>
               <p>To complete implementation:</p>
               <ul>
-                <li>Add detailed assessment dimension screens (screen-dim-0 to screen-dim-3)</li>
-                <li>Add detailed results screen (screen-results)</li>
-                <li>Implement full scoring and analysis</li>
+                <li>Populate all 25 DIMS questions across 4 dimensions (currently only TF1 complete)</li>
+                <li>Expand WD_FEATURES array with all 30+ features</li>
+                <li>Implement full heatmap and advanced analytics</li>
               </ul>
               <button className="btn secondary" style={{marginTop: '20px'}} onClick={() => showScreen('screen-landing')}>← Back to Home</button>
             </div>
