@@ -631,17 +631,11 @@ export default function Assessment() {
                           })}
                         </div>
                         
-                        {/* Scoring Guidance */}
-                        {q.scoring && (
-                          <div style={{marginTop: '20px', padding: '16px', background: '#f0f7ff', borderRadius: '8px', borderLeft: `4px solid ${dim.color}`}}>
-                            <div style={{fontSize: '12px', fontWeight: '600', color: '#666', marginBottom: '10px'}}>📊 Scoring Guide:</div>
-                            <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px'}}>
-                              {[1, 2, 3, 4, 5].map(score => (
-                                <div key={score} style={{fontSize: '12px', padding: '8px', background: '#fff', borderRadius: '4px', borderLeft: `3px solid ${['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'][score - 1]}`}}>
-                                  <div style={{fontWeight: '600', marginBottom: '3px'}}>Level {score}:</div>
-                                  <div style={{color: '#555', lineHeight: '1.4'}}>{q.scoring[score as keyof typeof q.scoring]}</div>
-                                </div>
-                              ))}
+                        {/* Scoring Guidance - Show only selected answer */}
+                        {q.scoring && scores[q.id] > 0 && (
+                          <div style={{marginTop: '16px', padding: '12px', background: '#f0f7ff', borderRadius: '6px', borderLeft: `3px solid ${['#E74C3C', '#F39C12', '#F1C40F', '#27AE60', '#16A085'][scores[q.id] - 1]}`}}>
+                            <div style={{fontSize: '11px', color: '#666'}}>
+                              <strong>You selected Level {scores[q.id]}:</strong> {q.scoring[scores[q.id] as keyof typeof q.scoring]}
                             </div>
                           </div>
                         )}
